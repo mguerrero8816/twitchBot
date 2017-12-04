@@ -48,6 +48,7 @@ module TwitchConnector
       logger.info 'Connected...'
 
       Thread.start do
+        Thread.current["name"] = "twitch_bot_thread"
         while (running) do
           ready = IO.select([socket])
 
