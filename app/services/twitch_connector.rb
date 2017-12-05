@@ -74,24 +74,15 @@ module TwitchConnector
   end
 
   def self.connect(channel_name)
-    bot = Twitch.new
-    bot.run(channel_name)
-    bot.send("JOIN ##{channel_name}")
-
-    # terminal commands. (unable to run in server)
-    # while (bot.running) do
-    #   command = gets.chomp
-    #
-    #   if command == 'quit'
-    #     bot.stop
-    #   else
-    #     bot.send(command)
-    #   end
-    # end
+    if !channel_name.blank?
+      bot = Twitch.new
+      bot.run(channel_name)
+      bot.send("JOIN ##{channel_name}")
+    end
   end
 
   def self.disconnect(channel_name)
-    if channel_name
+    if !channel_name.blank?
       twitch_bot_threads = Thread.list.select{|thread| thread[:channel_name] == channel_name }
       twitch_bot_threads.each{|thread| thread.kill}
     end
