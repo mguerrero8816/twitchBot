@@ -21,6 +21,17 @@ class SchedulesController < ApplicationController
   end
 
   def update
+    @schedule = Schedule.find(params[:id])
+    if @schedule.update_attributes(schedule_params)
+      redirect_to(schedules_path)
+    else
+      render :edit
+    end
+  end
+
+  def destroy
+    Schedule.find(params[:id]).destroy
+    redirect_to(schedules_path)
   end
 
   private
