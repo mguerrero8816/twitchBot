@@ -1,4 +1,20 @@
-<p>Bot is: <%= bot_status('mikeinthemorning') %></p>
-<p>test</p>
-<p><%= link_to('connect', connect_twitch_bots_path) %></p>
-<p><%= link_to('disconnect', disconnect_twitch_bots_path) %></p>
+<%= form_tag connect_twitch_bots_path do %>
+  <%= text_field_tag :channel_name %>
+  <%= submit_tag 'Connect' %>
+<% end %>
+<table>
+  <thead>
+    <tr>
+      <th>Active Channels</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% Thread.list.select{|thread| !thread[:channel_name].nil? }
+    .each do |channel| %>
+      <tr>
+        <td><%= channel[:channel_name] %></td>
+        <td><%= link_to('Disconnect', disconnect_twitch_bots_path(channel_name: channel[:channel_name]), method: :post) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

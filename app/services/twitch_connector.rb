@@ -6,7 +6,6 @@ module TwitchConnector
   TWITCH_PASS = SECRETS[Rails.env]['twitch_bot']['pass']
   TWITCH_SERVER = 'irc.chat.twitch.tv'
   TWITCH_PORT = 6667
-  TWITCH_CHANNEL = SECRETS[Rails.env]['twitch_bot']['user']
   TWITCH_BOT_NAME = 'Mikebot'
 
   Thread.abort_on_exception = true
@@ -27,9 +26,9 @@ module TwitchConnector
       socket.puts(message)
     end
 
-    def run(thread_name)
+    def run(channel_name)
       # terminate existing threads with same name
-      TwitchConnector.disconnect(thread_name)
+      TwitchConnector.disconnect(channel_name)
 
       logger.info 'Preparing to connect...'
 
@@ -42,7 +41,7 @@ module TwitchConnector
       logger.info 'Connected...'
 
       Thread.start do
-        Thread.current["name"] = thread_name
+        Thread.current["channel_name"] = channel_name
         while (running) do
           ready = IO.select([socket])
 
@@ -50,11 +49,14 @@ module TwitchConnector
             line    = s.gets
             match   = line.match(/^:(.+)!(.+) PRIVMSG #(.+) :(.+)$/)
             message = match && match[4]
+            message.to_s.strip!
+            p match
 
-            if message =~ /^!hello/
+            case message
+            when '!hello'
               user = match[1]
               logger.info "USER COMMAND: #{user} - !hello"
-              send "PRIVMSG ##{TWITCH_CHANNEL} :Hello, #{user} from #{TWITCH_BOT_NAME}"
+              send "PRIVMSG ##{channel_name} :Hello, #{user} from #{TWITCH_BOT_NAME}"
             end
 
             logger.info "> #{line}"
@@ -68,10 +70,10 @@ module TwitchConnector
     end
   end
 
-  def self.connect(channel=TWITCH_CHANNEL)
+  def self.connect(channel_name)
     bot = Twitch.new
-    bot.run(channel)
-    bot.send("JOIN \##{channel}")
+    bot.run(channel_name)
+    bot.send("JOIN ##{channel_name}")
 
     # terminal commands. (unable to run in server)
     # while (bot.running) do
@@ -85,8 +87,10 @@ module TwitchConnector
     # end
   end
 
-  def self.disconnect(thread_name=TWITCH_CHANNEL)
-    twitch_bot_threads = Thread.list.select{|thread| thread[:name] == thread_name }
-    twitch_bot_threads.each{|thread| thread.kill}
+  def self.disconnect(channel_name)
+    if channel_name
+      twitch_bot_threads = Thread.list.select{|thread| thread[:channel_name] == channel_name }
+      twitch_bot_threads.each{|thread| thread.kill}
+    end
   end
 end

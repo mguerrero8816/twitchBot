@@ -3,8 +3,8 @@ Rails.application.routes.draw do
   root to: 'home#index'
 
   resource :twitch_bots, only: [] do
-    get :connect
-    get :disconnect
+    post :connect
+    post :disconnect
   end
 
   resources :schedules
