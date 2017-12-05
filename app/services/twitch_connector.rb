@@ -49,14 +49,17 @@ module TwitchConnector
             line    = s.gets
             match   = line.match(/^:(.+)!(.+) PRIVMSG #(.+) :(.+)$/)
             message = match && match[4]
-            message.to_s.strip!
-            p match
+            message = message.to_s.strip
+            command_key = message
+            command_key[0] = ''
+            command_key = command_key.to_sym
 
-            case message
-            when '!hello'
+            if TwitchBotCommands::DEV_DEFINED_METHODS.include?(command_key)
               user = match[1]
-              logger.info "USER COMMAND: #{user} - !hello"
-              send "PRIVMSG ##{channel_name} :Hello, #{user} from #{TWITCH_BOT_NAME}"
+              logger.info "USER COMMAND: #{user} - #{message}"
+              bot_message = TwitchBotCommands.try(command_key)
+              # send "PRIVMSG ##{channel_name} :Hello, #{user} from #{TWITCH_BOT_NAME}"
+              send "PRIVMSG ##{channel_name} :#{bot_message}"
             end
 
             logger.info "> #{line}"
