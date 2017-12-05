@@ -1,5 +1,5 @@
 <%= form_tag connect_twitch_bots_path do %>
-  <table>
+  <table class="table">
     <tr>
       <td><%= label_tag :channel_name, 'Channel Name' %></td>
       <td><%= text_field_tag :channel_name %></td>
@@ -9,11 +9,11 @@
       <td><%= text_field_tag :bot_name, 'MikeBot' %></td>
     </tr>
     <tr>
-      <td><%= submit_tag 'Connect' %></td>
+      <td colspan="2"><%= submit_tag 'Connect' %></td>
     </tr>
   </table>
 <% end %>
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Active Channels</th>

@@ -25,8 +25,8 @@ module TwitchConnector
   class Twitch
     attr_reader :logger, :running, :socket
 
-    TWITCH_USER = SECRETS[Rails.env]['twitch_bot']['user']
-    TWITCH_PASS = SECRETS[Rails.env]['twitch_bot']['pass']
+    TWITCH_USER = Rails.application.secrets['twitch_bot']['user']
+    TWITCH_PASS = Rails.application.secrets['twitch_bot']['pass']
     TWITCH_SERVER = 'irc.chat.twitch.tv'
     TWITCH_PORT = 6667
 
