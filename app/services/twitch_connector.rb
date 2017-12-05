@@ -2,18 +2,21 @@ require 'socket'
 require 'logger'
 
 module TwitchConnector
+  DEFAULT_BOT_NAME = 'Mikebot'
+
   class << self
-    def connect(channel_name)
+    def connect(channel_name, bot_name)
       if !channel_name.blank?
         bot = Twitch.new
-        bot.run(channel_name)
+        bot_name = DEFAULT_BOT_NAME if bot_name.blank?
+        bot.run(channel_name, bot_name)
         bot.send("JOIN ##{channel_name}")
       end
     end
 
-    def disconnect(channel_name)
+    def disconnect(channel_name, bot_name)
       if !channel_name.blank?
-        twitch_bot_threads = Thread.list.select{|thread| thread[:channel_name] == channel_name }
+        twitch_bot_threads = Thread.list.select{|thread| thread[:channel_name] == channel_name && thread[:bot_name] == bot_name }
         twitch_bot_threads.each{|thread| thread.kill}
       end
     end
@@ -26,7 +29,6 @@ module TwitchConnector
     TWITCH_PASS = SECRETS[Rails.env]['twitch_bot']['pass']
     TWITCH_SERVER = 'irc.chat.twitch.tv'
     TWITCH_PORT = 6667
-    TWITCH_BOT_NAME = 'Mikebot'
 
     def initialize(logger = nil)
       @logger  = logger || Logger.new(STDOUT)
@@ -41,9 +43,9 @@ module TwitchConnector
       socket.puts(message)
     end
 
-    def run(channel_name)
-      # terminate existing threads with same name
-      TwitchConnector.disconnect(channel_name)
+    def run(channel_name, bot_name)
+      # terminate existing threads connected to the same channel and bot
+      TwitchConnector.disconnect(channel_name, bot_name)
 
       logger.info 'Preparing to connect...'
 
@@ -57,6 +59,7 @@ module TwitchConnector
 
       Thread.start do
         Thread.current["channel_name"] = channel_name
+        Thread.current["bot_name"] = bot_name
         while (running) do
           ready = IO.select([socket])
 
@@ -73,7 +76,6 @@ module TwitchConnector
               user = match[1]
               logger.info "USER COMMAND: #{user} - #{message}"
               bot_message = TwitchBotCommands.try(command_key)
-              # send "PRIVMSG ##{channel_name} :Hello, #{user} from #{TWITCH_BOT_NAME}"
               send "PRIVMSG ##{channel_name} :#{bot_message}"
             end
 
