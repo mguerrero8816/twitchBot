@@ -12,7 +12,8 @@
       <tr>
         <td><%= schedule.title %></td>
         <td><%= schedule.description %></td>
-        <td><%= schedule.start_at %></td>
+        <td><%= standard_table_date(schedule.start_at) %></td>
+        <td><%= standard_table_time(schedule.start_at) %></td>
         <td>
           <%= link_to 'Edit', edit_schedule_path(schedule.id) %>
           <span>|</span>
