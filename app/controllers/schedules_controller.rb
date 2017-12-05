@@ -8,7 +8,7 @@ class SchedulesController < ApplicationController
   end
 
   def create
-    @schedule = Schedule.new(params[:schedule])
+    @schedule = Schedule.new(schedule_params)
     if @schedule.save
       redirect_to(schedules_path)
     else
@@ -21,5 +21,12 @@ class SchedulesController < ApplicationController
   end
 
   def update
+  end
+
+  private
+
+  def schedule_params
+    params[:schedule][:start_at] = datetime_from_js_date_picker(params[:schedule], :start_at_date, :start_at_time)
+    params.require(:schedule).permit(:title, :description, :game_id, :start_at)
   end
 end

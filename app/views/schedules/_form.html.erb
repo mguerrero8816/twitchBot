@@ -8,6 +8,14 @@
     <td><%= f.text_area :description %></td>
   </tr>
   <tr>
+    <td><%= f.label :start_at_date %></td>
+    <td><%= f.text_field :start_at_date, readonly: true, class: 'jsDatepicker' %></td>
+  </tr>
+  <tr>
+    <td><%= f.label :start_at_time %></td>
+    <td><%= f.time_select :start_at_time, ampm: true %></td>
+  </tr>
+  <tr>
     <td><%= f.submit %></td>
   </tr>
 </table>
