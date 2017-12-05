@@ -16,6 +16,9 @@
     <td><%= f.time_select :start_at_time, value: f.object.start_at_time, ampm: true %></td>
   </tr>
   <tr>
-    <td><%= f.submit %></td>
+    <td>
+      <%= f.submit %>
+      <%= link_to 'Cancel', schedules_path %>
+    </td>
   </tr>
 </table>
