@@ -7,4 +7,6 @@ Rails.application.routes.draw do
     get :disconnect
   end
 
+  resources :schedules
+
 end
