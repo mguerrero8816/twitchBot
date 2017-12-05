@@ -2,16 +2,31 @@ require 'socket'
 require 'logger'
 
 module TwitchConnector
-  TWITCH_USER = SECRETS[Rails.env]['twitch_bot']['user']
-  TWITCH_PASS = SECRETS[Rails.env]['twitch_bot']['pass']
-  TWITCH_SERVER = 'irc.chat.twitch.tv'
-  TWITCH_PORT = 6667
-  TWITCH_BOT_NAME = 'Mikebot'
+  class << self
+    def connect(channel_name)
+      if !channel_name.blank?
+        bot = Twitch.new
+        bot.run(channel_name)
+        bot.send("JOIN ##{channel_name}")
+      end
+    end
 
-  Thread.abort_on_exception = true
+    def disconnect(channel_name)
+      if !channel_name.blank?
+        twitch_bot_threads = Thread.list.select{|thread| thread[:channel_name] == channel_name }
+        twitch_bot_threads.each{|thread| thread.kill}
+      end
+    end
+  end
 
   class Twitch
     attr_reader :logger, :running, :socket
+
+    TWITCH_USER = SECRETS[Rails.env]['twitch_bot']['user']
+    TWITCH_PASS = SECRETS[Rails.env]['twitch_bot']['pass']
+    TWITCH_SERVER = 'irc.chat.twitch.tv'
+    TWITCH_PORT = 6667
+    TWITCH_BOT_NAME = 'Mikebot'
 
     def initialize(logger = nil)
       @logger  = logger || Logger.new(STDOUT)
@@ -32,7 +47,7 @@ module TwitchConnector
 
       logger.info 'Preparing to connect...'
 
-      @socket = TCPSocket.new('irc.chat.twitch.tv', 6667)
+      @socket = TCPSocket.new(TWITCH_SERVER, TWITCH_PORT)
       @running = true
 
       socket.puts("PASS #{TWITCH_PASS}")
@@ -70,21 +85,6 @@ module TwitchConnector
 
     def stop
       @running = false
-    end
-  end
-
-  def self.connect(channel_name)
-    if !channel_name.blank?
-      bot = Twitch.new
-      bot.run(channel_name)
-      bot.send("JOIN ##{channel_name}")
-    end
-  end
-
-  def self.disconnect(channel_name)
-    if !channel_name.blank?
-      twitch_bot_threads = Thread.list.select{|thread| thread[:channel_name] == channel_name }
-      twitch_bot_threads.each{|thread| thread.kill}
     end
   end
 end
