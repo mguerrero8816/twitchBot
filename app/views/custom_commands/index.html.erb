@@ -1,4 +1,22 @@
-<% @custom_commands.each do |custom_command| %>
-  <%= custom_command.command %>
-  <%= custom_command.response %>
-<% end %>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Response</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @custom_commands.each do |custom_command| %>
+      <tr>
+        <td>!<%= custom_command.command %></td>
+        <td><%= custom_command.response %></td>
+        <td>
+          <%= link_to 'Edit', edit_custom_command_path(custom_command.id) %>
+          <span>|</span>
+          <%= link_to 'Delete', custom_command_path(custom_command.id), method: :delete, data: { confirm: 'Are you sure?' } %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,18 @@
+<table class="table">
+  <tbody>
+    <tr>
+      <td><%= f.label :command %></td>
+      <td>! <%= f.text_field :command %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :response %></td>
+      <td><%= f.text_area :response %></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <%= f.submit %>
+        <%= link_to 'Cancel', custom_commands_path %>
+      </td>
+    </tr>
+  </tbody>
+</table>

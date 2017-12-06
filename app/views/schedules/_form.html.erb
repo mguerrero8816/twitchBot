@@ -1,4 +1,4 @@
-<table>
+<table class="table">
   <tr>
     <td><%= f.label :title %></td>
     <td><%= f.text_field :title %></td>
@@ -16,7 +16,7 @@
     <td><%= f.time_select :start_at_time, value: f.object.start_at, ampm: true %></td>
   </tr>
   <tr>
-    <td>
+    <td colspan="2">
       <%= f.submit %>
       <%= link_to 'Cancel', schedules_path %>
     </td>
