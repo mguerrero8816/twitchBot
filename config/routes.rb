@@ -8,5 +8,6 @@ Rails.application.routes.draw do
   end
 
   resources :schedules
+  resources :custom_commands
 
 end
