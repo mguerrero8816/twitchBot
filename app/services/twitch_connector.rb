@@ -73,8 +73,12 @@ module TwitchConnector
             command_key = message
             command_key[0] = ''
             command_key = command_key.to_sym
-
-            if TwitchBotCommands::DEV_DEFINED_METHODS.include?(command_key)
+            puts message
+            p line
+            if line.include?('PING :tmi.twitch.tv')
+              puts 'Pinged, responding with PONG'
+              send "PONG :tmi.twitch.tv"
+            elsif TwitchBotCommands::DEV_DEFINED_METHODS.include?(command_key)
               user = match[1]
               logger.info "USER COMMAND: #{user} - #{message}"
               bot_message = TwitchBotCommands.try(command_key)
