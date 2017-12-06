@@ -80,8 +80,8 @@ module TwitchConnector
             elsif TwitchBotCommands::DEV_DEFINED_METHODS.include?(command_key)
               user = match[1]
               logger.info "USER COMMAND: #{user} - #{message}"
-              bot_message = TwitchBotCommands.try(command_key)
-              send "PRIVMSG ##{channel_name} :#{bot_message}"
+              bot_messages = [TwitchBotCommands.try(command_key)].flatten
+              bot_messages.each{|message| send "PRIVMSG ##{channel_name} :#{message}" }
             end
 
             logger.info "> #{line}"
