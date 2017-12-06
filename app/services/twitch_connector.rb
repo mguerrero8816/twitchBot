@@ -73,8 +73,7 @@ module TwitchConnector
             command_key = message
             command_key[0] = ''
             command_key = command_key.to_sym
-            puts message
-            p line
+
             if line.include?('PING :tmi.twitch.tv')
               puts 'Pinged, responding with PONG'
               send "PONG :tmi.twitch.tv"
