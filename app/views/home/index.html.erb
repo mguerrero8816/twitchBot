@@ -25,7 +25,7 @@
       <tr>
         <td><%= channel[:bot_name] %></td>
         <td><%= channel[:channel_name] %></td>
-        <td><%= link_to('Disconnect', disconnect_twitch_bots_path(channel_name: channel[:channel_name]), method: :post) %></td>
+        <td><%= link_to('Disconnect', disconnect_twitch_bots_path(channel_name: channel[:channel_name], bot_name: channel[:bot_name]), method: :post) %></td>
       </tr>
     <% end %>
   </tbody>

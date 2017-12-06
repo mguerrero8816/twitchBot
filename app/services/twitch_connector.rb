@@ -7,6 +7,7 @@ module TwitchConnector
   class << self
     def connect(channel_name, bot_name)
       if !channel_name.blank?
+        channel_name.downcase!
         bot = Twitch.new
         bot_name = DEFAULT_BOT_NAME if bot_name.blank?
         bot.run(channel_name, bot_name)
@@ -16,6 +17,7 @@ module TwitchConnector
 
     def disconnect(channel_name, bot_name)
       if !channel_name.blank?
+        channel_name.downcase!
         twitch_bot_threads = Thread.list.select{|thread| thread[:channel_name] == channel_name && thread[:bot_name] == bot_name }
         twitch_bot_threads.each{|thread| thread.kill}
       end
