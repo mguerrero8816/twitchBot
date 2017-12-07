@@ -1,6 +1,10 @@
 <table class="table">
   <thead>
     <tr>
+      <th>Bot Name</th>
+      <th>Channel Name</th>
+      <th>Live Status</th>
+      <th>Intended Status</th>
       <th></th>
     </tr>
   </thead>
@@ -20,29 +24,10 @@
             <% submit_label = 'Disconnect' %>
           <% end %>
           <%= form_tag form_path_name do %>
-            <%= hidden_field_tag :channel_name, channel_bot.channel_name %>
-            <%= hidden_field_tag :bot_name, channel_bot.bot_name %>
+            <%= hidden_field_tag :bot_id, channel_bot.id %>
             <%= submit_tag submit_label %>
           <% end %>
         </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<table class="table">
-  <thead>
-    <tr>
-      <th>Active Channels</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% Thread.list.select{|thread| !thread[:channel_name].nil? }
-    .each do |channel| %>
-      <tr>
-        <td><%= channel[:bot_name] %></td>
-        <td><%= channel[:channel_name] %></td>
-        <td><%= link_to('Disconnect', disconnect_twitch_bots_path(channel_name: channel[:channel_name], bot_name: channel[:bot_name]), method: :post) %></td>
       </tr>
     <% end %>
   </tbody>

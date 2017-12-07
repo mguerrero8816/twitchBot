@@ -12,6 +12,17 @@ class ChannelBot < ApplicationRecord
     STATUSES[intended_status_id]
   end
 
+  def connect
+    TwitchConnector.connect(channel_name, bot_name, id)
+    update_attribute('intended_status_id', 1)
+  end
+
+  def disconnect
+    TwitchConnector.disconnect(channel_name, bot_name)
+    update_attribute('live_status_id', 0)
+    update_attribute('intended_status_id', 0)
+  end
+
   private
 
   def set_defaults

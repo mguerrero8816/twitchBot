@@ -11,12 +11,12 @@ class TwitchConnector
   DEFAULT_BOT_NAME = 'Mikebot'
 
   class << self
-    def connect(channel_name, bot_name)
+    def connect(channel_name, bot_name, bot_id)
       if !channel_name.blank?
         channel_name.downcase!
         bot = new
         bot_name = DEFAULT_BOT_NAME if bot_name.blank?
-        bot.run(channel_name, bot_name)
+        bot.run(channel_name, bot_name, bot_id)
         bot.send("JOIN ##{channel_name}")
       end
     end
@@ -62,7 +62,7 @@ class TwitchConnector
     @running = false
   end
 
-  def run(channel_name, bot_name)
+  def run(channel_name, bot_name, bot_id)
     start_connection(channel_name, bot_name)
     Thread.start do
       Thread.current["channel_name"] = channel_name
@@ -81,6 +81,7 @@ class TwitchConnector
           if line.include?('PING :tmi.twitch.tv')
             puts 'Pinged, responding with PONG'
             send "PONG :tmi.twitch.tv"
+            ChannelBot.find(bot_id).update_attribute('live_status_id', 1)
           elsif TwitchBotCommands::DEV_DEFINED_METHODS.include?(command_key)
             user = match[1]
             logger.info "USER COMMAND: #{user} - #{message}"
