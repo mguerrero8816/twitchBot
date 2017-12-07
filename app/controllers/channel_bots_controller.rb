@@ -9,6 +9,7 @@ class ChannelBotsController < ApplicationController
 
   def create
     @channel_bot = ChannelBot.new(channel_bot_params)
+    p @channel_bot
     if @channel_bot.save
       redirect_to root_path
     else

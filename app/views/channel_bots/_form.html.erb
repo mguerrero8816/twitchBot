@@ -1,0 +1,18 @@
+<table class="table">
+  <tbody>
+    <tr>
+      <td><%= f.label :bot_name %></td>
+      <td><%= f.text_field :bot_name %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :channel_name %></td>
+      <td><%= f.text_field :channel_name %></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <%= f.submit %>
+        <%= link_to 'Cancel', root_path %>
+      </td>
+    </tr>
+  </tbody>
+</table>

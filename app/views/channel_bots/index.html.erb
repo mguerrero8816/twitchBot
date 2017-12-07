@@ -1,0 +1,14 @@
+<table>
+  <thead>
+  </thead>
+  <tbody>
+    <% @channel_bots.each do |channel_bot| %>
+      <tr>
+        <td><%= channel_bot.bot_name %></td>
+        <td><%= channel_bot.channel_name %></td>
+        <td><%= channel_bot.live_status %></td>
+        <td><%= channel_bot.intended_status %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
