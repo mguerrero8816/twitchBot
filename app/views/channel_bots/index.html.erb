@@ -1,13 +1,21 @@
-<table>
+<table class="table">
   <thead>
+    <tr>
+      <th>Bot Name</th>
+      <th>Channel Name</th>
+      <th></th>
+    </tr>
   </thead>
   <tbody>
     <% @channel_bots.each do |channel_bot| %>
       <tr>
         <td><%= channel_bot.bot_name %></td>
         <td><%= channel_bot.channel_name %></td>
-        <td><%= channel_bot.live_status %></td>
-        <td><%= channel_bot.intended_status %></td>
+        <td>
+          <%= link_to 'Edit', edit_channel_bot_path(channel_bot.id) %>
+          <span>|</span>
+          <%= link_to 'Delete', channel_bot_path(channel_bot.id), method: :delete, data: { confirm: 'Are you sure?' } %>
+        </td>
       </tr>
     <% end %>
   </tbody>

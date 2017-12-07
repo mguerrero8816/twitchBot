@@ -1,18 +1,35 @@
-<%= form_tag connect_twitch_bots_path do %>
-  <table class="table">
+<table class="table">
+  <thead>
     <tr>
-      <td><%= label_tag :channel_name, 'Channel Name' %></td>
-      <td><%= text_field_tag :channel_name %></td>
+      <th></th>
     </tr>
-    <tr>
-      <td><%= label_tag :bot_name, 'Bot Name' %></td>
-      <td><%= text_field_tag :bot_name, 'MikeBot' %></td>
-    </tr>
-    <tr>
-      <td colspan="2"><%= submit_tag 'Connect' %></td>
-    </tr>
-  </table>
-<% end %>
+  </thead>
+  <tbody>
+    <% @channel_bots.each do |channel_bot| %>
+      <tr>
+        <td><%= channel_bot.bot_name %></td>
+        <td><%= channel_bot.channel_name %></td>
+        <td><%= channel_bot.live_status %></td>
+        <td><%= channel_bot.intended_status %></td>
+        <td>
+          <% if channel_bot.intended_status_id == 0 %>
+            <% form_path_name = connect_twitch_bots_path %>
+            <% submit_label = 'Connect' %>
+          <% else %>
+            <% form_path_name = disconnect_twitch_bots_path %>
+            <% submit_label = 'Disconnect' %>
+          <% end %>
+          <%= form_tag form_path_name do %>
+            <%= hidden_field_tag :channel_name, channel_bot.channel_name %>
+            <%= hidden_field_tag :bot_name, channel_bot.bot_name %>
+            <%= submit_tag submit_label %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
 <table class="table">
   <thead>
     <tr>
