@@ -1,4 +1,4 @@
-class AddCustomCommands < ActiveRecord::Migration[5.0]
+class CreateCustomCommands < ActiveRecord::Migration[5.0]
   def up
     create_table :custom_commands do |t|
       t.string :command
