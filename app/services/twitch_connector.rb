@@ -72,7 +72,8 @@ class TwitchConnector
         ready[0].each do |s|
           line    = s.gets
           match   = line.match(/^:(.+)!(.+) PRIVMSG #(.+) :(.+)$/)
-          message = match && match[4]
+          sender = match.try(:[], 1)
+          message = match.try(:[], 4)
           message = message.to_s.strip
           command_key = message
           command_key[0] = ''
@@ -82,6 +83,7 @@ class TwitchConnector
             puts 'Pinged, responding with PONG'
             send "PONG :tmi.twitch.tv"
             ChannelBot.find(bot_id).update_attribute('live_status_id', 1)
+            Net::HTTP.get(URI(Rails.application.secrets.server_home))
           elsif TwitchBotCommands::DEV_DEFINED_METHODS.include?(command_key)
             user = match[1]
             logger.info "USER COMMAND: #{user} - #{message}"
