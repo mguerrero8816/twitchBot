@@ -7,6 +7,15 @@
       </li>
       <li class="nav-item dropdown active">
         <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Bots
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <%= link_to('All', channel_bots_path, class: 'dropdown-item')%>
+          <%= link_to('New', new_channel_bot_path, class: 'dropdown-item')%>
+        </div>
+      </li>
+      <li class="nav-item dropdown active">
+        <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Schedule Blocks
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">

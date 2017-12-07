@@ -1,0 +1,2 @@
+class ChannelBot < ApplicationRecord
+end

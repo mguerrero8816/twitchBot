@@ -9,5 +9,5 @@ Rails.application.routes.draw do
 
   resources :schedules
   resources :custom_commands
-
+  resources :channel_bots
 end
