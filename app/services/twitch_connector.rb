@@ -14,7 +14,7 @@ class TwitchConnector
     def connect(channel_name, bot_name)
       if !channel_name.blank?
         channel_name.downcase!
-        bot = TwitchConnector.new
+        bot = new
         bot_name = DEFAULT_BOT_NAME if bot_name.blank?
         bot.run(channel_name, bot_name)
         bot.send("JOIN ##{channel_name}")
@@ -43,9 +43,9 @@ class TwitchConnector
     socket.puts(message)
   end
 
-  def run(channel_name, bot_name)
+  def start_connection(channel_name, bot_name)
     # terminate existing threads connected to the same channel and bot
-    TwitchConnector.disconnect(channel_name, bot_name)
+    self.class.disconnect(channel_name, bot_name)
 
     logger.info 'Preparing to connect...'
 
@@ -56,13 +56,19 @@ class TwitchConnector
     socket.puts("NICK #{TWITCH_USER}")
 
     logger.info 'Connected...'
+  end
 
+  def stop_connection
+    @running = false
+  end
+
+  def run(channel_name, bot_name)
+    start_connection(channel_name, bot_name)
     Thread.start do
       Thread.current["channel_name"] = channel_name
       Thread.current["bot_name"] = bot_name
       while (running) do
         ready = IO.select([socket])
-
         ready[0].each do |s|
           line    = s.gets
           match   = line.match(/^:(.+)!(.+) PRIVMSG #(.+) :(.+)$/)
@@ -89,9 +95,5 @@ class TwitchConnector
         end
       end
     end
-  end
-
-  def stop
-    @running = false
   end
 end
