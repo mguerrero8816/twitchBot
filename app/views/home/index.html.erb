@@ -11,7 +11,7 @@
   <tbody>
     <% @channel_bots.each do |channel_bot| %>
       <tr>
-        <td><%= channel_bot.bot_name %></td>
+        <td><%= link_to channel_bot.bot_name, channel_bot_path(id: channel_bot.id) %></td>
         <td><%= channel_bot.channel_name %></td>
         <td><%= channel_bot.live_status %></td>
         <td><%= channel_bot.intended_status %></td>
@@ -32,3 +32,6 @@
     <% end %>
   </tbody>
 </table>
+
+<% threads = Thread.list %>
+<%= threads.count %>

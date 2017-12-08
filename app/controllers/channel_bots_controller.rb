@@ -3,6 +3,10 @@ class ChannelBotsController < ApplicationController
     @channel_bots = ChannelBot.all
   end
 
+  def show
+    @channel_bot = ChannelBot.find(params[:id])
+  end
+
   def new
     @channel_bot = ChannelBot.new
   end
