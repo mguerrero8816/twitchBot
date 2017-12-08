@@ -11,13 +11,6 @@ module TwitchConnector
     send_command("PRIVMSG ##{channel_name} :#{message}")
   end
 
-  def send_command(message)
-    @logger.info "< #{message}"
-    puts message
-    puts @socket
-    @socket.puts(message)
-  end
-
   def disconnect
     @running = false
     @socket  = nil
@@ -42,13 +35,12 @@ module TwitchConnector
         ready[0].each do |s|
           line    = s.gets
           match   = line.match(/^:(.+)!(.+) PRIVMSG #(.+) :(.+)$/)
-          sender  = match.try(:[], 1)
+          user    = match.try(:[], 1)
           message = match.try(:[], 4)
           message = message.to_s.strip
           command_key = message
           command_key[0] = ''
           command_key = command_key.to_sym
-          p line
 
           if line.include?('PING :tmi.twitch.tv')
             puts 'Pinged, responding with PONG'
@@ -56,13 +48,12 @@ module TwitchConnector
             ChannelBot.find(id).update_attribute('live_status_id', 1)
             # response = Net::HTTP.get(URI(Rails.application.secrets.server_home))
           elsif TwitchBotCommands::DEV_DEFINED_METHODS.include?(command_key)
-            user = match[1]
             @logger.info "USER COMMAND: #{user} - #{message}"
             bot_messages = [TwitchBotCommands.try(command_key)].flatten
             bot_messages.each{|bot_message| send_channel_message(bot_message) }
-          # elsif custom_command = CustomCommand.where('command = ?', command_key.to_s).last
-          #   @logger.info "USER COMMAND: #{user} - #{message}"
-          #   send_channel_message custom_command.response
+          elsif custom_command = CustomCommand.where('command = ?', command_key.to_s).last
+            @logger.info "USER COMMAND: #{user} - #{message}"
+            send_channel_message custom_command.response
           end
           @logger.info "> #{line}"
         end
@@ -85,6 +76,15 @@ module TwitchConnector
     @socket.puts("NICK #{TWITCH_USER}")
 
     @logger.info 'Connected...'
+    join_channel
+  end
+
+  def send_command(message)
+    @logger.info "< #{message}"
+    @socket.puts(message)
+  end
+
+  def join_channel
     send_command("JOIN ##{channel_name}")
   end
 end
