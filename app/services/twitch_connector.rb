@@ -1,6 +1,3 @@
-require 'socket'
-require 'logger'
-
 module TwitchConnector
   attr_reader :logger, :running, :socket
 
@@ -10,39 +7,20 @@ module TwitchConnector
   TWITCH_PORT = 6667
   DEFAULT_BOT_NAME = 'Mikebot'
 
-  # class << self
-  #   def connect(channel_name, bot_name, bot_id)
-  #     if !channel_name.blank?
-  #       channel_name.downcase!
-  #       bot = new
-  #       bot_name = DEFAULT_BOT_NAME if bot_name.blank?
-  #       bot.run(channel_name, bot_name, bot_id)
-  #       bot.send_command("JOIN ##{channel_name}")
-  #     end
-  #   end
-  #
-  #   def disconnect(channel_name, bot_name)
-  #     if !channel_name.blank?
-  #       channel_name.downcase!
-  #       twitch_bot_threads = Thread.list.select{|thread| thread[:channel_name] == channel_name && thread[:bot_name] == bot_name }
-  #       twitch_bot_threads.each{|thread| thread.kill}
-  #     end
-  #   end
-  # end
-
-  def send_channel_message(channel_name, message)
+  def send_channel_message(message)
     send_command("PRIVMSG ##{channel_name} :#{message}")
   end
 
   def send_command(message)
-    logger.info "< #{message}"
+    @logger.info "< #{message}"
     puts message
-    puts socket
-    socket.puts(message)
+    puts @socket
+    @socket.puts(message)
   end
 
   def disconnect
     @running = false
+    @socket  = nil
     self.update_attribute('intended_status_id', 0)
     self.update_attribute('live_status_id', 0)
     if !channel_name.blank?
@@ -59,17 +37,18 @@ module TwitchConnector
       Thread.current["channel_name"] = channel_name
       Thread.current["bot_name"] = bot_name
       Thread.current["bot_id"] = id
-      while (running) do
-        ready = IO.select([socket])
+      while (@running) do
+        ready = IO.select([@socket])
         ready[0].each do |s|
           line    = s.gets
           match   = line.match(/^:(.+)!(.+) PRIVMSG #(.+) :(.+)$/)
-          sender = match.try(:[], 1)
+          sender  = match.try(:[], 1)
           message = match.try(:[], 4)
           message = message.to_s.strip
           command_key = message
           command_key[0] = ''
           command_key = command_key.to_sym
+          p line
 
           if line.include?('PING :tmi.twitch.tv')
             puts 'Pinged, responding with PONG'
@@ -78,14 +57,14 @@ module TwitchConnector
             # response = Net::HTTP.get(URI(Rails.application.secrets.server_home))
           elsif TwitchBotCommands::DEV_DEFINED_METHODS.include?(command_key)
             user = match[1]
-            logger.info "USER COMMAND: #{user} - #{message}"
+            @logger.info "USER COMMAND: #{user} - #{message}"
             bot_messages = [TwitchBotCommands.try(command_key)].flatten
-            bot_messages.each{|bot_message| send_channel_message bot_message }
-          elsif custom_command = CustomCommand.where('command = ?', command_key.to_s).last
-            logger.info "USER COMMAND: #{user} - #{message}"
-            send_channel_message custom_command.response
+            bot_messages.each{|bot_message| send_channel_message(bot_message) }
+          # elsif custom_command = CustomCommand.where('command = ?', command_key.to_s).last
+          #   @logger.info "USER COMMAND: #{user} - #{message}"
+          #   send_channel_message custom_command.response
           end
-          logger.info "> #{line}"
+          @logger.info "> #{line}"
         end
       end
     end
@@ -97,16 +76,15 @@ module TwitchConnector
     # terminate existing threads connected to the same channel and bot
     disconnect
     @logger  = Logger.new(STDOUT)
-    @running = false
-    @socket  = nil
 
-    logger.info 'Preparing to connect...'
+    @logger.info 'Preparing to connect...'
     @socket = TCPSocket.new(TWITCH_SERVER, TWITCH_PORT)
     @running = true
 
-    socket.puts("PASS #{TWITCH_PASS}")
-    socket.puts("NICK #{TWITCH_USER}")
+    @socket.puts("PASS #{TWITCH_PASS}")
+    @socket.puts("NICK #{TWITCH_USER}")
 
-    logger.info 'Connected...'
+    @logger.info 'Connected...'
+    send_command("JOIN ##{channel_name}")
   end
 end
