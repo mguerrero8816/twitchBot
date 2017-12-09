@@ -1,0 +1,2 @@
+class ChannelCommandPermission < ApplicationRecord
+end
