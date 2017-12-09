@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 20171209072938) do
 
   create_table "channel_moderators", force: :cascade do |t|
     t.string   "moderator_name"
-    t.string   "channel_name"
+    t.string   "channel_bot_id"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
   end

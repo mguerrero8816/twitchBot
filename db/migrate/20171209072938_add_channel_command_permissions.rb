@@ -11,6 +11,6 @@ class AddChannelCommandPermissions < ActiveRecord::Migration[5.0]
   end
 
   def down
-    drop_table :schedules
+    drop_table :channel_command_permissions
   end
 end
