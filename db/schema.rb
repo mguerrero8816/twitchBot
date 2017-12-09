@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171209071018) do
+ActiveRecord::Schema.define(version: 20171209072938) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,6 +22,15 @@ ActiveRecord::Schema.define(version: 20171209071018) do
     t.string   "bot_name"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
+  end
+
+  create_table "channel_command_permissions", force: :cascade do |t|
+    t.integer  "permission_id"
+    t.integer  "custom_command_id"
+    t.string   "twitch_command_name"
+    t.integer  "channel_bot_id"
+    t.datetime "created_at",          null: false
+    t.datetime "updated_at",          null: false
   end
 
   create_table "channel_moderators", force: :cascade do |t|
