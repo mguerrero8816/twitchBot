@@ -1,0 +1,2 @@
+class ChannelModerator < ApplicationRecord
+end
