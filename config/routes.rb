@@ -9,5 +9,10 @@ Rails.application.routes.draw do
 
   resources :schedules
   resources :custom_commands
-  resources :channel_bots
+  resources :channel_bots do
+    post :add_moderator, on: :member
+    post :add_command_permission, on: :member
+    delete :destroy_moderator, on: :member
+    delete :destroy_command_permission, on: :member
+  end
 end

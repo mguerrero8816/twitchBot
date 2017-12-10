@@ -1,0 +1,48 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6">
+      <%= form_tag add_moderator_channel_bot_path(@channel_bot.id) do %>
+        <%= hidden_field_tag :channel_bot_id, @channel_bot.id %>
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th></th>
+            </tr>
+          </thead>
+          <body>
+            <tr>
+              <td><%= text_field_tag :moderator_name %></td>
+              <td><%= submit_tag 'Add Moderator' %></td>
+            </tr>
+          </tbody>
+        </table>
+      <% end %>
+    </div>
+    <div class="col-sm-6">
+      <%= form_tag add_command_permission_channel_bot_path(@channel_bot.id) do %>
+        <%= hidden_field_tag :channel_bot_id, @channel_bot.id %>
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Permission</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><%= select_tag :custom_command_id, custom_command_options_for_select %></td>
+              <td><%= select_tag :permission_id, permission_options_for_select %></td>
+              <td><%= submit_tag 'Add Permissions' %></td>
+            </tr>
+          </tbody>
+        </table>
+      <% end %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6"><%= render partial: 'moderators', locals: { moderators: @moderators } %></div>
+    <div class="col-sm-6"><%= render partial: 'command_permissions', locals: { command_permissions: @command_permissions } %></div>
+  </div>
+</div>

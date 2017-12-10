@@ -1,0 +1,16 @@
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th>Moderator</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% moderators.each do |moderator| %>
+      <tr>
+        <td><%= moderator.moderator_name %></td>
+        <td><%= link_to 'Delete', destroy_moderator_channel_bot_path(id: moderator.channel_bot_id, moderator_id: moderator.id), method: :delete %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
