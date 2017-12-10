@@ -1,4 +1,4 @@
-class AddChannelModerators < ActiveRecord::Migration[5.0]
+class CreateChannelModerators < ActiveRecord::Migration[5.0]
   def up
     create_table :channel_moderators do |t|
       t.string :moderator_name

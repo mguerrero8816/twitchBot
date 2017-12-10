@@ -1,4 +1,4 @@
-class AddChannelCommandPermissions < ActiveRecord::Migration[5.0]
+class CreateChannelCommandPermissions < ActiveRecord::Migration[5.0]
   def up
     create_table :channel_command_permissions do |t|
       t.integer :permission_id
