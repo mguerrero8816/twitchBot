@@ -1,7 +1,7 @@
 class ChannelBot < ApplicationRecord
   include TwitchConnector
   after_initialize :set_defaults
-  validates :bot_name, :channel_name, :live_status_id, :intended_status_id, presence: true
+  validates :bot_name, :channel_id, :live_status_id, :intended_status_id, presence: true
   validates :live_status_id, :intended_status_id, numericality: { less_than: 2 }
   STATUSES = [ 'Inactive', 'Active' ]
 
@@ -11,6 +11,10 @@ class ChannelBot < ApplicationRecord
 
   def intended_status
     STATUSES[intended_status_id]
+  end
+
+  def channel_name
+    Channel.find(channel_id).name
   end
 
   private

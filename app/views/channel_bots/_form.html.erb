@@ -6,10 +6,11 @@
     </tr>
     <tr>
       <td><%= f.label :channel_name %></td>
-      <td><%= f.text_field :channel_name %></td>
+      <td><%= f.text_field :channel_name, value: current_channel.name, disabled: true %></td>
     </tr>
     <tr>
       <td colspan="2">
+        <%= f.hidden_field :channel_id, value: current_channel.id %>
         <%= f.submit %>
         <%= link_to 'Cancel', root_path %>
       </td>

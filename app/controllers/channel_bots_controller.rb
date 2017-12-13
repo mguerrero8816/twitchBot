@@ -1,6 +1,6 @@
 class ChannelBotsController < ApplicationController
   def index
-    @channel_bots = ChannelBot.all
+    @channel_bots = ChannelBot.where(channel_id: current_channel.id)
   end
 
   def show
@@ -63,6 +63,6 @@ class ChannelBotsController < ApplicationController
   private
 
   def channel_bot_params
-    params.require(:channel_bot).permit(:live_status_id, :intended_status_id, :channel_name, :bot_name)
+    params.require(:channel_bot).permit(:live_status_id, :intended_status_id, :channel_id, :bot_name)
   end
 end
