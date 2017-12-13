@@ -32,6 +32,9 @@
           <%= link_to('New', new_custom_command_path, class: 'dropdown-item')%>
         </div>
       </li>
+      <li class="nav-item active">
+        <%= link_to('Logout', destroy_channel_session_path, method: :delete, class: 'nav-link') %>
+      </li>
     </ul>
   </div>
 </nav>
