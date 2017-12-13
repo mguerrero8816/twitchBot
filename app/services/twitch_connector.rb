@@ -46,7 +46,6 @@ module TwitchConnector
             puts 'Pinged, responding with PONG'
             send_command "PONG :tmi.twitch.tv"
             ChannelBot.find(id).update_attribute('live_status_id', 1)
-            Thread.new{ Net::HTTP.get(URI(Rails.application.secrets.server_home)) }
           elsif TwitchBotCommands::DEV_DEFINED_METHODS.include?(command_key)
             @logger.info "USER COMMAND: #{user} - #{message}"
             bot_messages = [TwitchBotCommands.try(command_key)].flatten
