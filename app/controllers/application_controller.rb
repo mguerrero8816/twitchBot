@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  before_action :authenticate_channel!
   protect_from_forgery with: :exception
 
   def datetime_from_js_date_picker(object_params, js_date_key, rails_time_key)
@@ -8,3 +9,4 @@ class ApplicationController < ActionController::Base
     Time.zone.local(js_date.year, js_date.month, js_date.day, hours, minutes)
   end
 end
+  
