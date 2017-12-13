@@ -2,7 +2,7 @@ class DeviseCreateChannels < ActiveRecord::Migration[5.0]
   def change
     create_table :channels do |t|
       ## Database authenticatable
-      t.string :email,              null: false, default: ""
+      t.string :email#,              null: false, default: ""
       t.string :encrypted_password, null: false, default: ""
 
       ## Recoverable
@@ -34,7 +34,7 @@ class DeviseCreateChannels < ActiveRecord::Migration[5.0]
       t.timestamps null: false
     end
 
-    add_index :channels, :email,                unique: true
+    # add_index :channels, :email,                unique: true
     add_index :channels, :reset_password_token, unique: true
     # add_index :channels, :confirmation_token,   unique: true
     # add_index :channels, :unlock_token,         unique: true

@@ -18,30 +18,14 @@ ActiveRecord::Schema.define(version: 20171213045147) do
   create_table "channel_bots", force: :cascade do |t|
     t.integer  "live_status_id"
     t.integer  "intended_status_id"
-    t.string   "channel_name"
     t.string   "bot_name"
+    t.integer  "channel_id"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
   end
 
-  create_table "channel_command_permissions", force: :cascade do |t|
-    t.integer  "permission_id"
-    t.integer  "custom_command_id"
-    t.string   "twitch_command_name"
-    t.integer  "channel_bot_id"
-    t.datetime "created_at",          null: false
-    t.datetime "updated_at",          null: false
-  end
-
-  create_table "channel_moderators", force: :cascade do |t|
-    t.string   "moderator_name"
-    t.string   "channel_bot_id"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-  end
-
   create_table "channels", force: :cascade do |t|
-    t.string   "email",                  default: "", null: false
+    t.string   "email"
     t.string   "encrypted_password",     default: "", null: false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
@@ -54,15 +38,32 @@ ActiveRecord::Schema.define(version: 20171213045147) do
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
     t.string   "name"
-    t.index ["email"], name: "index_channels_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_channels_on_reset_password_token", unique: true, using: :btree
+  end
+
+  create_table "command_permissions", force: :cascade do |t|
+    t.integer  "permission_id"
+    t.integer  "channel_id"
+    t.integer  "command_type_id"
+    t.string   "command_name"
+    t.integer  "command_id"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
   end
 
   create_table "custom_commands", force: :cascade do |t|
     t.string   "command"
     t.string   "response"
+    t.integer  "channel_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "moderators", force: :cascade do |t|
+    t.string   "moderator_name"
+    t.string   "channel_id"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -70,6 +71,7 @@ ActiveRecord::Schema.define(version: 20171213045147) do
     t.string   "description"
     t.integer  "game_id"
     t.datetime "start_at"
+    t.integer  "channel_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
   end
