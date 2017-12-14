@@ -5,7 +5,7 @@ module FiltersHelper
   end
 
   def permission_options_for_select
-    permissions = ChannelCommandPermission::PERMISSIONS
+    permissions = CommandPermission::PERMISSIONS
     options_for_select(permissions.map.with_index{|permission, index| [permission, index]})
   end
 end

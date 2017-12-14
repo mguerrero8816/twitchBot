@@ -5,8 +5,8 @@ class ChannelBotsController < ApplicationController
 
   def show
     @channel_bot = ChannelBot.find(params[:id])
-    @moderators = ChannelModerator.where(channel_bot_id: params[:id])
-    @command_permissions = ChannelCommandPermission.select('channel_command_permissions.*, custom_commands.command AS command_name').where(channel_bot_id: params[:id]).joins('LEFT JOIN custom_commands ON channel_command_permissions.custom_command_id = custom_commands.id')
+    @moderators = Moderator.where(channel_id: params[:id])
+    @command_permissions = CommandPermission.select('command_permissions.*, custom_commands.command AS command_name').where(channel_id: params[:id]).joins('LEFT JOIN custom_commands ON command_permissions.command_id = custom_commands.id')
   end
 
   def new
@@ -41,22 +41,22 @@ class ChannelBotsController < ApplicationController
   end
 
   def add_moderator
-    ChannelModerator.create(channel_bot_id: params[:id], moderator_name: params[:moderator_name])
+    Moderator.create(channel_bot_id: params[:id], moderator_name: params[:moderator_name])
     redirect_to channel_bot_path(params[:id])
   end
 
   def add_command_permission
-    ChannelCommandPermission.create(channel_bot_id: params[:id], custom_command_id: params[:custom_command_id], permission_id: params[:permission_id] )
+    CommandPermission.create(channel_bot_id: params[:id], custom_command_id: params[:custom_command_id], permission_id: params[:permission_id] )
     redirect_to channel_bot_path(params[:id])
   end
 
   def destroy_moderator
-    ChannelModerator.find(params[:moderator_id]).destroy
+    Moderator.find(params[:moderator_id]).destroy
     redirect_to channel_bot_path(params[:id])
   end
 
   def destroy_command_permission
-    ChannelCommandPermission.find(params[:custom_command_id]).destroy
+    CommandPermission.find(params[:custom_command_id]).destroy
     redirect_to channel_bot_path(params[:id])
   end
 

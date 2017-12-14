@@ -12,7 +12,7 @@
       <tr>
         <td>!<%= custom_command.command %></td>
         <td><%= custom_command.response %></td>
-        <td><%= CommandPermission::PERMISSIONS[custom_command.permission_id] %></td>
+        <td><%= CommandPermission::PERMISSIONS[custom_command.command_permission_id] %></td>
         <td>
           <%= link_to 'Edit', edit_custom_command_path(custom_command.id) %>
           <span>|</span>

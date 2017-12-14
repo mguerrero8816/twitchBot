@@ -2,7 +2,7 @@ class CustomCommandsController < ApplicationController
   def index
     @custom_commands = (
     CustomCommand.select('custom_commands.*,
-                          COALESCE(command_permissions.id, 0) AS permission_id')
+                          COALESCE(command_permissions.id, 0) AS command_permission_id')
                  .where('custom_commands.channel_id = ?', current_channel.id)
                  .joins('LEFT JOIN command_permissions ON custom_commands.id = command_permissions.command_id')
                  .order('LOWER(command) ASC')
