@@ -37,6 +37,7 @@ module TwitchConnector
           match   = line.match(/^:(.+)!(.+) PRIVMSG #(.+) :(.+)$/)
           user    = match.try(:[], 1)
           message = match.try(:[], 4)
+          channel_name = line.split('PRIVMSG #').last.split(' :').first
           message = message.to_s.strip
           command_key = message
           command_key[0] = ''
@@ -50,7 +51,7 @@ module TwitchConnector
             @logger.info "USER COMMAND: #{user} - #{message}"
             bot_messages = [TwitchBotCommands.try(command_key)].flatten
             bot_messages.each{|bot_message| send_channel_message(bot_message) }
-          elsif custom_command = CustomCommand.where('command = ?', command_key.to_s).last
+          elsif custom_command = CustomCommand.where('channels.name = ? AND custom_commands.command = ?', channel_name.to_s, command_key.to_s).joins('LEFT JOIN channels ON custom_commands.channel_id = channels.id').last
             @logger.info "USER COMMAND: #{user} - #{message}"
             send_channel_message custom_command.response
           end
