@@ -1,4 +1,31 @@
 <table class="table">
+  <thead class="hidden" data-expandable="new-command">
+    <tr>
+      <th>Command</th>
+      <th>Response</th>
+      <th>Permission</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody class="hidden" data-expandable="new-command">
+    <tr>
+      <td><%= text_field_tag 'new_command[command]' %></td>
+      <td><%= text_field_tag 'new_command[response]' %></td>
+      <td><%= select_tag 'new_command[permission_id]', permission_options_for_select %></td>
+      <td>
+        <span class="fake-link submit-form-link">Create</span>
+        <span>|</span>
+        <span class="fake-link expander" data-expander="new-command">Cancel</span>
+      </td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr data-expandable="new-command">
+      <td colspan="4">
+        <span class="fake-link expander" data-expander="new-command">New Command</span>
+      </td>
+    </tr>
+  </tbody>
   <thead>
     <tr>
       <th>Command</th>
@@ -22,3 +49,9 @@
     <% end %>
   </tbody>
 </table>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    bindExpanders()
+  })
+</script>
