@@ -1,14 +1,64 @@
 <table class="table">
+  <thead class="hidden" data-expandable="new-moderator">
+    <tr>
+      <th>Name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody class="hidden" data-expandable="new-moderator">
+    <tr class="js-form-fields-container">
+      <td><%= text_field_tag 'moderator[name]' %></td>
+      <td class="js-form-container">
+        <%= form_tag moderators_path do %>
+          <%= hidden_field_tag 'moderator[channel_id]', current_channel.id %>
+        <% end %>
+        <span class="fake-link js-submit-form">Create</span>
+        <span>|</span>
+        <span class="fake-link expander" data-expander="new-moderator">Cancel</span>
+      </td>
+    </tr>
+  </tbody>
+  <tbody data-expandable="new-moderator">
+    <tr>
+      <td colspan="2">
+        <span class="fake-link expander" data-expander="new-moderator">New Moderator</span>
+      </td>
+    </tr>
+  </tbody>
   <thead>
     <tr>
       <th>Name</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     <% @moderators.each do |moderator| %>
-      <tr>
+      <tr data-expandable="moderator-<%= moderator.id %>">
         <td><%= moderator.name %></td>
+        <td>
+          <span class="fake-link expander" data-expander="moderator-<%= moderator.id %>">Edit</span>
+          <span>|</span>
+          <%= link_to 'Delete', moderator_path(moderator.id), method: :delete, data: { confirm: 'Are you sure?' } %>
+        </td>
+      </tr>
+      <tr class="hidden js-form-fields-container" data-expandable="moderator-<%= moderator.id %>">
+        <td><%= text_field_tag 'moderator[name]', moderator.name %></td>
+        <td class="js-form-container">
+          <%= form_tag moderator_path(id: moderator.id), method: :put do %>
+            <%= hidden_field_tag 'moderator[channel_id]', current_channel.id %>
+          <% end %>
+          <span class="fake-link js-submit-form">Update</span>
+          <span>|</span>
+          <span class="fake-link expander" data-expander="moderator-<%= moderator.id %>">Cancel</span>
+        </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    bindExpanders()
+    bindJsFormSubmitters()
+  })
+</script>
