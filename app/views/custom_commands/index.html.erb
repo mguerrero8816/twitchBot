@@ -8,14 +8,15 @@
     </tr>
   </thead>
   <tbody class="hidden" data-expandable="new-command">
-    <tr>
-      <td>!<%= text_field_tag 'new_command[command]' %></td>
-      <td><%= text_area_tag 'new_command[response]' %></td>
-      <td><%= select_tag 'new_command[permission_id]', permission_options_for_select %></td>
-      <td>
-        <%= form_tag custom_commands_path, class: 'new-command-form' do %>
+    <tr class="js-form-fields-container">
+      <td>!<%= text_field_tag 'custom_command[command]' %></td>
+      <td><%= text_area_tag 'custom_command[response]' %></td>
+      <td><%= select_tag 'custom_command[permission_id]', permission_options_for_select %></td>
+      <td class="js-form-container">
+        <%= form_tag custom_commands_path do %>
+          <%= hidden_field_tag 'custom_command[channel_id]', current_channel.id %>
         <% end %>
-        <span class="fake-link submit-new-command">Create</span>
+        <span class="fake-link js-submit-form">Create</span>
         <span>|</span>
         <span class="fake-link expander" data-expander="new-command">Cancel</span>
       </td>
@@ -48,14 +49,15 @@
           <%= link_to 'Delete', custom_command_path(custom_command.id), method: :delete, data: { confirm: 'Are you sure?' } %>
         </td>
       </tr>
-      <tr class="hidden" data-expandable="command-<%= custom_command.id %>">
-        <td>!<%= text_field_tag 'edit_command[command]', custom_command.command %></td>
-        <td><%= text_area_tag 'edit_command[response]', custom_command.response %></td>
-        <td><%= select_tag 'edit_command[permission_id]', permission_options_for_select(custom_command.permission_id) %></td>
-        <td>
-          <%= form_tag edit_custom_command_path(id: custom_command.id), class: 'edit-command-form' do %>
+      <tr class="hidden js-form-fields-container" data-expandable="command-<%= custom_command.id %>">
+        <td>!<%= text_field_tag 'custom_command[command]', custom_command.command %></td>
+        <td><%= text_area_tag 'custom_command[response]', custom_command.response %></td>
+        <td><%= select_tag 'custom_command[permission_id]', permission_options_for_select(custom_command.permission_id) %></td>
+        <td class="js-form-container">
+          <%= form_tag edit_custom_command_path(id: custom_command.id) do %>
+            <%= hidden_field_tag 'custom_command[channel_id]', current_channel.id %>
           <% end %>
-          <span class="fake-link">Update</span>
+          <span class="fake-link js-submit-form">Update</span>
           <span>|</span>
           <span class="fake-link expander" data-expander="command-<%= custom_command.id %>">Cancel</span>
         </td>
@@ -67,5 +69,6 @@
 <script type="text/javascript">
   $(document).ready(function(){
     bindExpanders()
+    bindJsFormSubmitters()
   })
 </script>
