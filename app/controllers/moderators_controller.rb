@@ -12,10 +12,15 @@ class ModeratorsController < ApplicationController
   end
 
   def update
+    @moderator = Moderator.find(params[:id])
+    if @moderator.update_attributes(moderator_params)
+    else
+    end
     redirect_to moderators_path
   end
 
   def destroy
+    Moderator.find(params[:id]).destroy
     redirect_to moderators_path
   end
 
