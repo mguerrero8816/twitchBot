@@ -41,7 +41,7 @@ class ChannelBotsController < ApplicationController
   end
 
   def add_moderator
-    Moderator.create(channel_bot_id: params[:id], moderator_name: params[:moderator_name])
+    Moderator.create(channel_bot_id: params[:id], name: params[:name])
     redirect_to channel_bot_path(params[:id])
   end
 

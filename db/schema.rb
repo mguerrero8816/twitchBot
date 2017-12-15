@@ -60,10 +60,10 @@ ActiveRecord::Schema.define(version: 20171213045147) do
   end
 
   create_table "moderators", force: :cascade do |t|
-    t.string   "moderator_name"
+    t.string   "name"
     t.string   "channel_id"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "schedules", force: :cascade do |t|
