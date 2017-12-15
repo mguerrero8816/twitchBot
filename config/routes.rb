@@ -10,6 +10,7 @@ Rails.application.routes.draw do
 
   resources :schedules
   resources :custom_commands, except: [:new, :edit]
+  resources :moderators, except: [:new, :edit]
   resources :channel_bots do
     post   :add_moderator,              on: :member
     post   :add_command_permission,     on: :member

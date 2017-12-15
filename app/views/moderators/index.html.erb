@@ -1,0 +1,14 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @moderators.each do |moderator| %>
+      <tr>
+        <td><%= moderator.name %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
