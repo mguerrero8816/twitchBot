@@ -9,8 +9,8 @@
   </thead>
   <tbody class="hidden" data-expandable="new-command">
     <tr>
-      <td><%= text_field_tag 'new_command[command]' %></td>
-      <td><%= text_field_tag 'new_command[response]' %></td>
+      <td>!<%= text_field_tag 'new_command[command]' %></td>
+      <td><%= text_area_tag 'new_command[response]' %></td>
       <td><%= select_tag 'new_command[permission_id]', permission_options_for_select %></td>
       <td>
         <span class="fake-link submit-form-link">Create</span>
@@ -36,14 +36,24 @@
   </thead>
   <tbody>
     <% @custom_commands.each do |custom_command| %>
-      <tr>
+      <tr data-expandable="command-<%= custom_command.id %>">
         <td>!<%= custom_command.command %></td>
         <td><%= custom_command.response %></td>
         <td><%= CommandPermission::PERMISSIONS[custom_command.command_permission_id] %></td>
         <td>
-          <%= link_to 'Edit', edit_custom_command_path(custom_command.id) %>
+          <span class="fake-link expander" data-expander="command-<%= custom_command.id %>">Edit</span>
           <span>|</span>
           <%= link_to 'Delete', custom_command_path(custom_command.id), method: :delete, data: { confirm: 'Are you sure?' } %>
+        </td>
+      </tr>
+      <tr class="hidden" data-expandable="command-<%= custom_command.id %>">
+        <td>!<%= text_field_tag 'edit_command[command]', custom_command.command %></td>
+        <td><%= text_area_tag 'edit_command[response]', custom_command.response %></td>
+        <td><%= select_tag 'edit_command[permission_id]', permission_options_for_select(custom_command.permission_id) %></td>
+        <td>
+          <span class="fake-link">Update</span>
+          <span>|</span>
+          <span class="fake-link expander" data-expander="command-<%= custom_command.id %>">Cancel</span>
         </td>
       </tr>
     <% end %>
