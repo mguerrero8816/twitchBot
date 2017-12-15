@@ -54,7 +54,7 @@
         <td><%= text_area_tag 'custom_command[response]', custom_command.response %></td>
         <td><%= select_tag 'custom_command[permission_id]', permission_options_for_select(custom_command.permission_id) %></td>
         <td class="js-form-container">
-          <%= form_tag edit_custom_command_path(id: custom_command.id) do %>
+          <%= form_tag custom_command_path(id: custom_command.id), method: :put do %>
             <%= hidden_field_tag 'custom_command[channel_id]', current_channel.id %>
           <% end %>
           <span class="fake-link js-submit-form">Update</span>

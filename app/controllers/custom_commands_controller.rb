@@ -9,10 +9,6 @@ class CustomCommandsController < ApplicationController
     )
   end
 
-  def new
-    @custom_command = CustomCommand.new
-  end
-
   def create
     @custom_command = CustomCommand.new(custom_command_params)
     if @custom_command.save
@@ -20,10 +16,6 @@ class CustomCommandsController < ApplicationController
     else
       render :new
     end
-  end
-
-  def edit
-    @custom_command = CustomCommand.find(params[:id])
   end
 
   def update
