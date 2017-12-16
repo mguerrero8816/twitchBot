@@ -6,11 +6,11 @@ class CommandsController < ApplicationController
     command_sql_data.each do |sql_data|
       commands_data[sql_data.command_name] = sql_data
     end
-    Struct.new('BotCommand', :name, :permission_id, :channel_id)
+    Struct.new('BotCommand', :id, :name, :permission_id, :channel_id)
     @commands = []
     command_names.each do |command_name|
       sql_data = commands_data[command_name]
-      bot_command = Struct::BotCommand.new(command_name, sql_data.try(:permission_id), sql_data.try(:channel_id))
+      bot_command = Struct::BotCommand.new(sql_data.try(:id), command_name, sql_data.try(:permission_id), sql_data.try(:channel_id))
       @commands << bot_command
     end
   end

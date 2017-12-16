@@ -7,12 +7,13 @@
     </tr>
   </thead>
   <tbody>
-    <% @commands.each do |command| %>
-      <tr>
-        <td>!<%= command.name %></td>
-        <td><%= command.permission_id %></td>
-        <td></td>
-      </tr>
-    <% end %>
+    <%= render partial: 'command', collection: @commands %>
   </tbody>
 </table>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    bindExpanders()
+    bindJsFormSubmitters()
+  })
+</script>

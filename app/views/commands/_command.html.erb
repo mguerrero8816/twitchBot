@@ -1,0 +1,15 @@
+<% expandable_data = "command-#{command.id}" %>
+<tr class="js-form-fields-container">
+  <td>!<%= command.name %></td>
+  <td data-expandable="<%= expandable_data %>"><%= command.permission_id %></td>
+  <td data-expandable="<%= expandable_data %>">
+    <span class="fake-link expander" data-expander="<%= expandable_data %>">Edit</span>
+  </td>
+
+  <td class="hidden" data-expandable="<%= expandable_data %>"><%= select_tag 'command[permission_id]', permission_options_for_select(command.permission_id) %></td>
+  <td class="hidden js-form-container" data-expandable="<%= expandable_data %>">
+    <span class="fake-link js-submit-form">Submit</span>
+    <span>|</span>
+    <span class="fake-link expander" data-expander="<%= expandable_data %>">Cancel</span>
+  </td>
+</tr>
