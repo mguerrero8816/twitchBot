@@ -1,0 +1,16 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Permission</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @commands.each do |command| %>
+      <tr>
+        <td>!<%= command.name %></td>
+        <td><%= command.permission_id %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
