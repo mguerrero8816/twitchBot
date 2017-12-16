@@ -38,30 +38,7 @@
     </tr>
   </thead>
   <tbody>
-    <% @custom_commands.each do |custom_command| %>
-      <tr class="js-form-fields-container">
-        <td data-expandable="command-<%= custom_command.id %>">!<%= custom_command.command %></td>
-        <td data-expandable="command-<%= custom_command.id %>"><%= custom_command.response %></td>
-        <td data-expandable="command-<%= custom_command.id %>"><%= CommandPermission::PERMISSIONS[custom_command.command_permission_id] %></td>
-        <td data-expandable="command-<%= custom_command.id %>">
-          <span class="fake-link expander" data-expander="command-<%= custom_command.id %>">Edit</span>
-          <span>|</span>
-          <%= link_to 'Delete', custom_command_path(custom_command.id), method: :delete, data: { confirm: 'Are you sure?' } %>
-        </td>
-
-        <td class="hidden" data-expandable="command-<%= custom_command.id %>">!<%= text_field_tag 'custom_command[command]', custom_command.command %></td>
-        <td class="hidden" data-expandable="command-<%= custom_command.id %>"><%= text_area_tag 'custom_command[response]', custom_command.response %></td>
-        <td class="hidden" data-expandable="command-<%= custom_command.id %>"><%= select_tag 'custom_command[permission_id]', permission_options_for_select(custom_command.command_permission_id) %></td>
-        <td class="hidden js-form-container" data-expandable="command-<%= custom_command.id %>">
-          <%= form_tag custom_command_path(id: custom_command.id), method: :put do %>
-            <%= hidden_field_tag 'custom_command[channel_id]', current_channel.id %>
-          <% end %>
-          <span class="fake-link js-submit-form">Update</span>
-          <span>|</span>
-          <span class="fake-link expander" data-expander="command-<%= custom_command.id %>">Cancel</span>
-        </td>
-      </tr>
-    <% end %>
+    <%= render partial: 'custom_command', collection: @custom_commands %>
   </tbody>
 </table>
 

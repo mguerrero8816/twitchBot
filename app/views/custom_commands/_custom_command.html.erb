@@ -1,0 +1,23 @@
+<% expandable_data = "command-#{custom_command.id}"%>
+<tr class="js-form-fields-container">
+  <td data-expandable="<%= expandable_data %>">!<%= custom_command.command %></td>
+  <td data-expandable="<%= expandable_data %>"><%= custom_command.response %></td>
+  <td data-expandable="<%= expandable_data %>"><%= CommandPermission::PERMISSIONS[custom_command.command_permission_id] %></td>
+  <td data-expandable="<%= expandable_data %>">
+    <span class="fake-link expander" data-expander="<%= expandable_data %>">Edit</span>
+    <span>|</span>
+    <%= link_to 'Delete', custom_command_path(custom_command.id), method: :delete, data: { confirm: 'Are you sure?' } %>
+  </td>
+
+  <td class="hidden" data-expandable="<%= expandable_data %>">!<%= text_field_tag 'custom_command[command]', custom_command.command %></td>
+  <td class="hidden" data-expandable="<%= expandable_data %>"><%= text_area_tag 'custom_command[response]', custom_command.response %></td>
+  <td class="hidden" data-expandable="<%= expandable_data %>"><%= select_tag 'custom_command[permission_id]', permission_options_for_select(custom_command.command_permission_id) %></td>
+  <td class="hidden js-form-container" data-expandable="<%= expandable_data %>">
+    <%= form_tag custom_command_path(id: custom_command.id), method: :put do %>
+      <%= hidden_field_tag 'custom_command[channel_id]', current_channel.id %>
+    <% end %>
+    <span class="fake-link js-submit-form">Update</span>
+    <span>|</span>
+    <span class="fake-link expander" data-expander="<%= expandable_data %>">Cancel</span>
+  </td>
+</tr>
