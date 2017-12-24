@@ -1,13 +1,18 @@
-<% expandable_data = "command-#{command.id}" %>
+<% expandable_data = "command-#{command.id.to_i}-#{command.name}" %>
 <tr class="js-form-fields-container">
   <td>!<%= command.name %></td>
-  <td data-expandable="<%= expandable_data %>"><%= command.permission_id %></td>
+  <td data-expandable="<%= expandable_data %>"><%= CommandPermission::PERMISSIONS[command.permission_id.to_i] %></td>
   <td data-expandable="<%= expandable_data %>">
     <span class="fake-link expander" data-expander="<%= expandable_data %>">Edit</span>
   </td>
 
   <td class="hidden" data-expandable="<%= expandable_data %>"><%= select_tag 'command[permission_id]', permission_options_for_select(command.permission_id) %></td>
   <td class="hidden js-form-container" data-expandable="<%= expandable_data %>">
+
+    <%= form_tag command_path(id: command.id.to_i), method: :put do %>
+      <%= hidden_field_tag 'command[channel_id]', current_channel.id %>
+      <%= hidden_field_tag 'command[name]', command.name %>
+    <% end %>
     <span class="fake-link js-submit-form">Submit</span>
     <span>|</span>
     <span class="fake-link expander" data-expander="<%= expandable_data %>">Cancel</span>
