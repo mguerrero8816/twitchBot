@@ -30,6 +30,11 @@ module TwitchConnector
       Thread.current["channel_name"] = channel_name
       Thread.current["bot_name"] = bot_name
       Thread.current["bot_id"] = id
+      commands_data = build_commands_data
+      custom_commands_data = build_custom_commands_data
+      commands_list = commands_data.keys
+      custom_commands_list = custom_commands_data.keys
+
       while (@running) do
         ready = IO.select([@socket])
         ready[0].each do |s|
@@ -42,18 +47,15 @@ module TwitchConnector
           command_key = message
           command_key[0] = ''
           command_key = command_key.to_sym
+          @logger.info "USER COMMAND: #{user} - #{message}"
 
           if line.include?('PING :tmi.twitch.tv')
-            puts 'Pinged, responding with PONG'
-            send_command "PONG :tmi.twitch.tv"
-            ChannelBot.find(id).update_attribute('live_status_id', 1)
-          elsif TwitchBotCommands::DEV_DEFINED_METHODS.include?(command_key)
-            @logger.info "USER COMMAND: #{user} - #{message}"
+            send_pong_response
+          elsif commands_list.include?(command_key)
             bot_messages = [TwitchBotCommands.try(command_key)].flatten
             bot_messages.each{|bot_message| send_channel_message(bot_message) }
-          elsif custom_command = CustomCommand.where('channels.name = ? AND custom_commands.command = ?', channel.to_s, command_key.to_s).joins('LEFT JOIN channels ON custom_commands.channel_id = channels.id').last
-            @logger.info "USER COMMAND: #{user} - #{message}"
-            send_channel_message custom_command.response
+          elsif custom_commands_list.include?(command_key)
+            send_channel_message custom_commands_data[command_key].response
           end
           @logger.info "> #{line}"
         end
@@ -86,5 +88,39 @@ module TwitchConnector
 
   def join_channel
     send_command("JOIN ##{channel_name}")
+  end
+
+  def build_commands_data
+    commands_list = TwitchBotCommands.methods(false)
+    permissions = CommandPermission.where('command_id IS NULL AND command_name IN (?) AND channel_id = ?', commands_list, channel_id)
+    Struct.new('CommandSettings', :command_name, :permission_id)
+    commands_data = {}
+    permissions.each do |permission|
+      name_key = permission.command_name.to_sym
+      commands_data[name_key] = Struct::CommandSettings.new(name_key, permission.permission_id)
+    end
+    commands_data
+  end
+
+  def build_custom_commands_data
+    custom_commands_list = (
+      CustomCommand.select('custom_commands.*,
+                            command_permissions.permission_id AS command_permission_id')
+                   .joins('LEFT JOIN command_permissions ON custom_commands.id = command_permissions.command_id')
+                   .where('custom_commands.channel_id = ?', channel_id)
+    )
+    custom_commands_data = {}
+    Struct.new('CommandSettings', :response, :permission_id)
+    custom_commands_list.each do |custom_command|
+      name_key = custom_command.command.to_sym
+      custom_commands_data[name_key] = Struct::CommandSettings.new(custom_command.response, custom_command.command_permission_id)
+    end
+    custom_commands_data
+  end
+
+  def send_pong_response
+    puts 'Pinged, responding with PONG'
+    send_command "PONG :tmi.twitch.tv"
+    ChannelBot.find(id).update_attribute('live_status_id', 1)
   end
 end

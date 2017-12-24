@@ -1,6 +1,6 @@
 class CommandsController < ApplicationController
   def index
-    command_names = TwitchBotCommands::DEV_DEFINED_METHODS
+    command_names = TwitchBotCommands.methods(false)
     command_sql_data = CommandPermission.where('command_permissions.channel_id = ? AND command_permissions.command_name IN (?) AND command_permissions.command_id IS NULL', current_channel.id, command_names)
     commands_data = {}
     command_sql_data.each do |sql_data|

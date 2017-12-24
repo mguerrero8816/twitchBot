@@ -10,7 +10,4 @@ module TwitchBotCommands
       responses
     end
   end
-
-  #keep at end of file
-  DEV_DEFINED_METHODS = methods(false)
 end
