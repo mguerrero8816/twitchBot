@@ -31,8 +31,8 @@ module TwitchConnector
       Thread.current["bot_name"] = bot_name
       Thread.current["bot_id"] = id
       commands_data = build_commands_data
-      custom_commands_data = build_custom_commands_data
       commands_list = commands_data.keys
+      custom_commands_data = build_custom_commands_data
       custom_commands_list = custom_commands_data.keys
       cached_channel_name = channel_name
 
@@ -53,7 +53,7 @@ module TwitchConnector
           if line.include?('PING :tmi.twitch.tv')
             send_pong_response
           elsif commands_list.include?(command_key)
-            send_channel_command(cached_channel_name, command_key)
+            send_channel_command(cached_channel_name, commands_data[command_key])
           elsif custom_commands_list.include?(command_key)
             send_channel_custom_command(cached_channel_name, custom_commands_data[command_key])
           end
@@ -124,12 +124,12 @@ module TwitchConnector
     ChannelBot.find(id).update_attribute('live_status_id', 1)
   end
 
-  def send_channel_command(cached_channel_name, command_key)
-    bot_messages = [TwitchBotCommands.try(command_key)].flatten
+  def send_channel_command(cached_channel_name, command_settings)
+    bot_messages = [TwitchBotCommands.try(command_settings.try(:command_name))].flatten
     bot_messages.each{|bot_message| send_channel_message(cached_channel_name, bot_message) }
   end
 
-  def send_channel_custom_command(cached_channel_name, custom_command_data)
-    send_channel_message(cached_channel_name, custom_command_data.response)
+  def send_channel_custom_command(cached_channel_name, command_settings)
+    send_channel_message(cached_channel_name, command_settings.response)
   end
 end
