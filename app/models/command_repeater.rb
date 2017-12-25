@@ -1,0 +1,2 @@
+class CommandRepeater < ApplicationRecord
+end
