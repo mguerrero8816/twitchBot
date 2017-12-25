@@ -7,8 +7,8 @@ module TwitchConnector
   TWITCH_PORT = 6667
   DEFAULT_BOT_NAME = 'Mikebot'
 
-  def send_channel_message(message)
-    send_command("PRIVMSG ##{channel_name} :#{message}")
+  def send_channel_message(target_channel_name, message)
+    send_command("PRIVMSG ##{target_channel_name} :#{message}")
   end
 
   def disconnect
@@ -34,6 +34,7 @@ module TwitchConnector
       custom_commands_data = build_custom_commands_data
       commands_list = commands_data.keys
       custom_commands_list = custom_commands_data.keys
+      cached_channel_name = channel_name
 
       while (@running) do
         ready = IO.select([@socket])
@@ -53,9 +54,9 @@ module TwitchConnector
             send_pong_response
           elsif commands_list.include?(command_key)
             bot_messages = [TwitchBotCommands.try(command_key)].flatten
-            bot_messages.each{|bot_message| send_channel_message(bot_message) }
+            bot_messages.each{|bot_message| send_channel_message(cached_channel_name, bot_message) }
           elsif custom_commands_list.include?(command_key)
-            send_channel_message custom_commands_data[command_key].response
+            send_channel_message(cached_channel_name, custom_commands_data[command_key].response)
           end
           @logger.info "> #{line}"
         end
