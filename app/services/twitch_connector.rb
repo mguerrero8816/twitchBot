@@ -35,6 +35,8 @@ module TwitchConnector
       custom_commands_data = build_custom_commands_data
       custom_commands_list = custom_commands_data.keys
       cached_channel_name = channel_name
+      moderator_list = Moderator.where(channel_id: channel_id).map(&:name)
+      moderator_list << channel_name
 
       while (@running) do
         ready = IO.select([@socket])
@@ -53,9 +55,9 @@ module TwitchConnector
           if line.include?('PING :tmi.twitch.tv')
             send_pong_response
           elsif commands_list.include?(command_key)
-            send_channel_command(cached_channel_name, commands_data[command_key])
+            send_channel_command(cached_channel_name, moderator_list.include?(user), commands_data[command_key])
           elsif custom_commands_list.include?(command_key)
-            send_channel_custom_command(cached_channel_name, custom_commands_data[command_key])
+            send_channel_custom_command(cached_channel_name, moderator_list.include?(user), custom_commands_data[command_key])
           end
           @logger.info "> #{line}"
         end
@@ -124,12 +126,21 @@ module TwitchConnector
     ChannelBot.find(id).update_attribute('live_status_id', 1)
   end
 
-  def send_channel_command(cached_channel_name, command_settings)
-    bot_messages = [TwitchBotCommands.try(command_settings.try(:command_name))].flatten
-    bot_messages.each{|bot_message| send_channel_message(cached_channel_name, bot_message) }
+  def send_channel_command(cached_channel_name, is_admin, command_settings)
+    if command_permitted(command_settings.permission_id, is_admin)
+      bot_messages = [TwitchBotCommands.try(command_settings.try(:command_name))].flatten
+      bot_messages.each{|bot_message| send_channel_message(cached_channel_name, bot_message) }
+    end
   end
 
-  def send_channel_custom_command(cached_channel_name, command_settings)
-    send_channel_message(cached_channel_name, command_settings.response)
+  def send_channel_custom_command(cached_channel_name, is_admin, command_settings)
+    if command_permitted(command_settings.permission_id, is_admin)
+      send_channel_message(cached_channel_name, command_settings.response)
+    end
+  end
+
+  # permit command if set to all or set to admins and sent by admins
+  def command_permitted(permission_id, is_admin)
+    permission_id == 1 || (permission_id == 0 && is_admin)
   end
 end
