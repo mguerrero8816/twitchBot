@@ -53,10 +53,9 @@ module TwitchConnector
           if line.include?('PING :tmi.twitch.tv')
             send_pong_response
           elsif commands_list.include?(command_key)
-            bot_messages = [TwitchBotCommands.try(command_key)].flatten
-            bot_messages.each{|bot_message| send_channel_message(cached_channel_name, bot_message) }
+            send_channel_command(cached_channel_name, command_key)
           elsif custom_commands_list.include?(command_key)
-            send_channel_message(cached_channel_name, custom_commands_data[command_key].response)
+            send_channel_custom_command(cached_channel_name, custom_commands_data[command_key])
           end
           @logger.info "> #{line}"
         end
@@ -123,5 +122,14 @@ module TwitchConnector
     puts 'Pinged, responding with PONG'
     send_command "PONG :tmi.twitch.tv"
     ChannelBot.find(id).update_attribute('live_status_id', 1)
+  end
+
+  def send_channel_command(cached_channel_name, command_key)
+    bot_messages = [TwitchBotCommands.try(command_key)].flatten
+    bot_messages.each{|bot_message| send_channel_message(cached_channel_name, bot_message) }
+  end
+
+  def send_channel_custom_command(cached_channel_name, custom_command_data)
+    send_channel_message(cached_channel_name, custom_command_data.response)
   end
 end
