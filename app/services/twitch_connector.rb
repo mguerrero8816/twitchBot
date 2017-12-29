@@ -1,11 +1,11 @@
 module TwitchConnector
   attr_reader :logger, :running, :socket
 
-  TWITCH_USER = Rails.application.secrets['twitch_bot_user']
-  TWITCH_PASS = Rails.application.secrets['twitch_bot_pass']
-  TWITCH_SERVER = 'irc.chat.twitch.tv'
-  TWITCH_PORT = 6667
-  DEFAULT_BOT_NAME = 'Mikebot'
+  TWITCH_USER = Rails.application.secrets['twitch_bot_user'].freeze
+  TWITCH_PASS = Rails.application.secrets['twitch_bot_pass'].freeze
+  TWITCH_SERVER = 'irc.chat.twitch.tv'.freeze
+  TWITCH_PORT = 6667.freeze
+  COMMAND_TIME_LIMIT = 5.freeze # time in seconds to command cooldown
 
   def send_channel_message(target_channel_name, message)
     send_command("PRIVMSG ##{target_channel_name} :#{message}")
@@ -104,11 +104,11 @@ module TwitchConnector
   def build_commands_data
     commands_list = TwitchBotCommands.methods(false)
     permissions = CommandPermission.where('command_id IS NULL AND command_name IN (?) AND channel_id = ?', commands_list, channel_id)
-    Struct.new('CommandSettings', :command_name, :permission_id)
+    Struct.new('CommandSettings', :command_name, :last_used, :permission_id)
     commands_data = {}
     permissions.each do |permission|
       name_key = permission.command_name.to_sym
-      commands_data[name_key] = Struct::CommandSettings.new(name_key, permission.permission_id)
+      commands_data[name_key] = Struct::CommandSettings.new(name_key, Time.zone.now-COMMAND_TIME_LIMIT.seconds, permission.permission_id)
     end
     commands_data
   end
@@ -123,10 +123,10 @@ module TwitchConnector
                    .where('custom_commands.channel_id = ?', channel_id)
     )
     custom_commands_data = {}
-    Struct.new('CustomCommandSettings', :response, :permission_id, :cycle_seconds)
+    Struct.new('CustomCommandSettings', :response, :last_used, :permission_id, :cycle_seconds)
     custom_commands_list.each do |custom_command|
       name_key = custom_command.command.to_sym
-      custom_commands_data[name_key] = Struct::CustomCommandSettings.new(custom_command.response, custom_command.command_permission_id, custom_command.repeater_cycle_time)
+      custom_commands_data[name_key] = Struct::CustomCommandSettings.new(custom_command.response, Time.zone.now-5.seconds, custom_command.command_permission_id, custom_command.repeater_cycle_time)
     end
     custom_commands_data
   end
@@ -138,21 +138,23 @@ module TwitchConnector
   end
 
   def send_channel_command(cached_channel_name, is_admin, command_settings)
-    if command_permitted(command_settings.permission_id, is_admin)
+    if command_permitted(command_settings, is_admin)
       bot_messages = [TwitchBotCommands.try(command_settings.try(:command_name))].flatten
       bot_messages.each{|bot_message| send_channel_message(cached_channel_name, bot_message) }
+      command_settings.last_used = Time.zone.now
     end
   end
 
   def send_channel_custom_command(cached_channel_name, is_admin, command_settings)
-    if command_permitted(command_settings.permission_id, is_admin)
+    if command_permitted(command_settings, is_admin)
       send_channel_message(cached_channel_name, command_settings.response)
+      command_settings.last_used = Time.zone.now
     end
   end
 
   # permit command if set to all or set to admins and sent by admins
-  def command_permitted(permission_id, is_admin)
-    permission_id == 1 || (permission_id == 0 && is_admin)
+  def command_permitted(command_settings, is_admin)
+    (command_settings.permission_id == 1 || (command_settings.permission_id == 0 && is_admin)) && command_settings.last_used < (Time.zone.now - COMMAND_TIME_LIMIT.seconds)
   end
 
   def spawn_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
