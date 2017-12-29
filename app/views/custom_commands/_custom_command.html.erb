@@ -3,6 +3,8 @@
   <td data-expandable="<%= expandable_data %>">!<%= custom_command.command %></td>
   <td data-expandable="<%= expandable_data %>"><%= custom_command.response %></td>
   <td data-expandable="<%= expandable_data %>"><%= CommandPermission::PERMISSIONS[custom_command.command_permission_id] %></td>
+  <td data-expandable="<%= expandable_data %>"><%= custom_command.repeater_start_at %></td>
+  <td data-expandable="<%= expandable_data %>"><%= custom_command.repeater_cycle_time %></td>
   <td data-expandable="<%= expandable_data %>">
     <span class="fake-link expander" data-expander="<%= expandable_data %>">Edit</span>
     <span>|</span>
@@ -12,6 +14,8 @@
   <td class="hidden" data-expandable="<%= expandable_data %>">!<%= text_field_tag 'custom_command[command]', custom_command.command %></td>
   <td class="hidden" data-expandable="<%= expandable_data %>"><%= text_area_tag 'custom_command[response]', custom_command.response %></td>
   <td class="hidden" data-expandable="<%= expandable_data %>"><%= select_tag 'custom_command[permission_id]', permission_options_for_select(custom_command.command_permission_id) %></td>
+  <td class="hidden" data-expandable="<%= expandable_data %>"><%= datetime_select 'custom_command', 'repeater_start', ampm: true %></td>
+  <td class="hidden" data-expandable="<%= expandable_data %>"><%= number_field_tag 'custom_command[repeater_cycle]' %></td>
   <td class="hidden js-form-container" data-expandable="<%= expandable_data %>">
     <%= form_tag custom_command_path(id: custom_command.id), method: :put do %>
       <%= hidden_field_tag 'custom_command[channel_id]', current_channel.id %>

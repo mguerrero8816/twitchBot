@@ -1,9 +1,11 @@
 <table class="table">
-  <thead class="hidden" data-expandable="new-command">
+  <thead>
     <tr>
       <th>Command</th>
       <th>Response</th>
       <th>Permission</th>
+      <th>Repeat Start</th>
+      <th>Repeat Cycle</th>
       <th></th>
     </tr>
   </thead>
@@ -29,14 +31,6 @@
       </td>
     </tr>
   </tbody>
-  <thead>
-    <tr>
-      <th>Command</th>
-      <th>Response</th>
-      <th>Permission</th>
-      <th></th>
-    </tr>
-  </thead>
   <tbody>
     <%= render partial: 'custom_command', collection: @custom_commands %>
   </tbody>
