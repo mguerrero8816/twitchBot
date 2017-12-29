@@ -163,7 +163,7 @@ module TwitchConnector
       Thread.current["bot_id"] = cached_bot_id
       sleep command_settings.cycle_seconds.to_i
       send_channel_message(cached_channel_name, command_settings.response)
-      spawn_repeater(cached_channel_name, command_settings)
+      spawn_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
     end
   end
 
