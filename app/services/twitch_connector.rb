@@ -117,7 +117,7 @@ module TwitchConnector
     custom_commands_list = (
       CustomCommand.select('custom_commands.*,
                             command_permissions.permission_id AS command_permission_id,
-                            command_repeaters.cycle_second AS repeater_cycle_time')
+                            command_repeaters.cycle_seconds AS repeater_cycle_time')
                    .joins('LEFT JOIN command_repeaters ON custom_commands.id = command_repeaters.command_id')
                    .joins('LEFT JOIN command_permissions ON custom_commands.id = command_permissions.command_id')
                    .where('custom_commands.channel_id = ?', channel_id)

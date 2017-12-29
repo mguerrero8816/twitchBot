@@ -17,7 +17,7 @@ class CustomCommand < ApplicationRecord
   def update_repeater
     current_repeater = CommandRepeater.where(command_id: id).first || CommandRepeater.new(command_id: id, channel_id: channel_id)
     current_repeater.start_at = repeater_start
-    current_repeater.cycle_second = repeater_cycle
+    current_repeater.cycle_seconds = repeater_cycle
     current_repeater.save
   end
 end

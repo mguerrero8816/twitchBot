@@ -8,5 +8,8 @@ class ApplicationController < ActionController::Base
     minutes = object_params["#{rails_time_key}(5i)".to_sym]
     Time.zone.local(js_date.year, js_date.month, js_date.day, hours, minutes)
   end
+
+  def date_from_js_date_picker(object_params, js_date_key)
+    object_params[js_date_key].to_date
+  end
 end
-  

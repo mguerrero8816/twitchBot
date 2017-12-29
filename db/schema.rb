@@ -52,7 +52,7 @@ ActiveRecord::Schema.define(version: 20171225113339) do
   end
 
   create_table "command_repeaters", force: :cascade do |t|
-    t.datetime "start_at"
+    t.date     "start_at"
     t.integer  "cycle_seconds"
     t.integer  "status_id"
     t.integer  "channel_id"
