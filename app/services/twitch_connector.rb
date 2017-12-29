@@ -21,24 +21,33 @@ module TwitchConnector
       twitch_bot_threads = Thread.list.select{|thread| thread['bot_id'] == id || ( thread[:channel_name] == channel_name && thread[:bot_name] == bot_name ) }
       twitch_bot_threads.each{|thread| thread.kill}
     end
+    kill_repeaters
   end
 
   def connect
     initialize_connection
     self.update_attribute('intended_status_id', 1)
     Thread.start do
-      Thread.current["channel_name"] = channel_name
-      Thread.current["bot_name"] = bot_name
-      Thread.current["bot_id"] = id
       commands_data = build_commands_data
       commands_list = commands_data.keys
       custom_commands_data = build_custom_commands_data
       custom_commands_list = custom_commands_data.keys
       cached_channel_name = channel_name
+      cached_bot_name = bot_name
+      cached_bot_id = id
       moderator_list = Moderator.where(channel_id: channel_id).map(&:name)
-      moderator_list << channel_name
+      moderator_list << cached_channel_name
+      Thread.current["channel_name"] = cached_channel_name
+      Thread.current["bot_name"] = cached_bot_name
+      Thread.current["bot_id"] = cached_bot_id
 
+      custom_commands_data.each do |_, custom_command_settings|
+        if custom_command_settings.cycle_seconds.to_i > 0
+          spawn_repeater(cached_channel_name, cached_bot_name, cached_bot_id, custom_command_settings)
+        end
+      end
       while (@running) do
+
         ready = IO.select([@socket])
         ready[0].each do |s|
           line    = s.gets
@@ -107,15 +116,17 @@ module TwitchConnector
   def build_custom_commands_data
     custom_commands_list = (
       CustomCommand.select('custom_commands.*,
-                            command_permissions.permission_id AS command_permission_id')
+                            command_permissions.permission_id AS command_permission_id,
+                            command_repeaters.cycle_second AS repeater_cycle_time')
+                   .joins('LEFT JOIN command_repeaters ON custom_commands.id = command_repeaters.command_id')
                    .joins('LEFT JOIN command_permissions ON custom_commands.id = command_permissions.command_id')
                    .where('custom_commands.channel_id = ?', channel_id)
     )
     custom_commands_data = {}
-    Struct.new('CommandSettings', :response, :permission_id)
+    Struct.new('CustomCommandSettings', :response, :permission_id, :cycle_seconds)
     custom_commands_list.each do |custom_command|
       name_key = custom_command.command.to_sym
-      custom_commands_data[name_key] = Struct::CommandSettings.new(custom_command.response, custom_command.command_permission_id)
+      custom_commands_data[name_key] = Struct::CustomCommandSettings.new(custom_command.response, custom_command.command_permission_id, custom_command.repeater_cycle_time)
     end
     custom_commands_data
   end
@@ -142,5 +153,22 @@ module TwitchConnector
   # permit command if set to all or set to admins and sent by admins
   def command_permitted(permission_id, is_admin)
     permission_id == 1 || (permission_id == 0 && is_admin)
+  end
+
+  def spawn_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
+    Thread.new do
+      Thread.current['type'] = 'command_repeater'
+      Thread.current["channel_name"] = cached_channel_name
+      Thread.current["bot_name"] = cached_bot_name
+      Thread.current["bot_id"] = cached_bot_id
+      sleep command_settings.cycle_seconds.to_i
+      send_channel_message(cached_channel_name, command_settings.response)
+      spawn_repeater(cached_channel_name, command_settings)
+    end
+  end
+
+  def kill_repeaters
+    repeater_threads = Thread.list.select{|thread| (thread[:bot_id] == id || ( thread[:channel_name] == channel_name && thread[:bot_name] == bot_name )) && thread[:type] == 'command_repeater' }
+    repeater_threads.each{|thread| thread.kill}
   end
 end
