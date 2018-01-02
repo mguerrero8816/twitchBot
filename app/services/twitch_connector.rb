@@ -42,11 +42,13 @@ module TwitchConnector
       Thread.current["bot_id"] = cached_bot_id
 
       custom_commands_data.each do |_, custom_command_settings|
-        if custom_command_settings.status_id == 1 && custom_command_settings.repeater_cycle_seconds > 0 && (custom_command_settings.repeater_start_at.nil? || custom_command_setings.repeater_start_at <= Time.zone.now)
+        p 'test1'
+        if custom_command_settings.repeater_status_id == 1 && custom_command_settings.repeater_cycle_seconds > 0 && (custom_command_settings.repeater_start_at.nil? || custom_command_settings.repeater_start_at <= Time.zone.now)
+          p 'test2'
           spawn_repeater(cached_channel_name, cached_bot_name, cached_bot_id, custom_command_settings)
         end
       end
-      
+
       while (@running) do
         ready = IO.select([@socket])
         ready[0].each do |s|
@@ -128,7 +130,7 @@ module TwitchConnector
     Struct.new('CustomCommandSettings', :response, :last_used, :permission_id, :repeater_status_id, :repeater_cycle_seconds, :repeater_start_at)
     custom_commands_list.each do |custom_command|
       name_key = custom_command.command.to_sym
-      custom_commands_data[name_key] = Struct::CustomCommandSettings.new(custom_command.response, Time.zone.now-5.seconds, custom_command.command_permission_id, custom_command.repeater_status_id, custom_command.repeater_cycle_seconds, custom_command_repeater_start_at)
+      custom_commands_data[name_key] = Struct::CustomCommandSettings.new(custom_command.response, Time.zone.now-5.seconds, custom_command.command_permission_id, custom_command.repeater_status_id, custom_command.repeater_cycle_seconds, custom_command.repeater_start_at)
     end
     custom_commands_data
   end
