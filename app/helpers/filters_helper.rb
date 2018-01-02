@@ -13,4 +13,10 @@ module FiltersHelper
     statuses = CommandRepeater::STATUSES
     options_for_select(statuses.map.with_index{|status, index| [status, index]}, selected: selected)
   end
+
+  # takes date or time
+  # returns string
+  def js_datepicker_date(date)
+    date.strftime('%B %d, %Y') if date
+  end
 end

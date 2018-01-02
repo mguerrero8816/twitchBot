@@ -9,7 +9,7 @@
   </tr>
   <tr>
     <td><%= f.label :start_at_date %></td>
-    <td><%= f.text_field :start_at_date, value: standard_table_date(f.object.start_at), readonly: true, class: 'jsDatepicker' %></td>
+    <td><%= f.text_field :start_at_date, value: js_datepicker_date(f.object.start_at), readonly: true, class: 'jsDatepicker' %></td>
   </tr>
   <tr>
     <td><%= f.label :start_at_time %></td>
