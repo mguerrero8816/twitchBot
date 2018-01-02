@@ -3,9 +3,9 @@
   <td data-expandable="<%= expandable_data %>">!<%= custom_command.command %></td>
   <td data-expandable="<%= expandable_data %>"><%= custom_command.response %></td>
   <td data-expandable="<%= expandable_data %>"><%= CommandPermission::PERMISSIONS[custom_command.command_permission_id] %></td>
-  <td data-expandable="<%= expandable_data %>"><%= CommandRepeater::STATUSES[custom_command.repeater_status_id] %></td>
-  <td data-expandable="<%= expandable_data %>"><%= custom_command.repeater_cycle_time %></td>
-  <td data-expandable="<%= expandable_data %>"><%= custom_command.repeater_start_at %></td>
+  <td data-expandable="<%= expandable_data %>"><%= custom_command.repeater_status_id > 0 ? CommandRepeater::STATUSES[custom_command.repeater_status_id] : '-' %></td>
+  <td data-expandable="<%= expandable_data %>"><%= standard_table_text(custom_command.repeater_cycle_time) %></td>
+  <td data-expandable="<%= expandable_data %>"><%= standard_table_date(custom_command.repeater_start_at) %></td>
   <td data-expandable="<%= expandable_data %>">
     <span class="fake-link expander" data-expander="<%= expandable_data %>">Edit</span>
     <span>|</span>
