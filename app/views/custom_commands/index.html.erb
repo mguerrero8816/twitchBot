@@ -15,9 +15,9 @@
       <td>!<%= text_field_tag 'custom_command[command]' %></td>
       <td><%= text_area_tag 'custom_command[response]' %></td>
       <td><%= select_tag 'custom_command[permission_id]', permission_options_for_select %></td>
-      <td><%= select_tag 'custom_command[repeater_status]', repeater_status_options_for_select %></td>
-      <td><%= number_field_tag 'custom_command[repeater_cycle]' %></td>
-      <td><%= text_field_tag 'custom_command[repeater_start]', nil, class: 'jsDatepicker', id: nil %></td>
+      <td><%= select_tag 'custom_command[command_repeater_attributes][status_id]', repeater_status_options_for_select %></td>
+      <td><%= number_field_tag 'custom_command[command_repeater_attributes][cycle_seconds]' %></td>
+      <td><%= text_field_tag 'custom_command[command_repeater_attributes][start_at]', nil, class: 'jsDatepicker', id: nil %></td>
       <td class="js-form-container">
         <%= form_tag custom_commands_path do %>
           <%= hidden_field_tag 'custom_command[channel_id]', current_channel.id %>

@@ -37,7 +37,7 @@ class CustomCommandsController < ApplicationController
   private
 
   def custom_command_params
-    params[:custom_command][:repeater_start] = date_from_js_date_picker(params[:custom_command], :repeater_start)
-    params.require(:custom_command).permit(:command, :response, :channel_id, :permission_id, :repeater_status, :repeater_cycle, :repeater_start)
+    params[:custom_command][:command_repeater_attributes][:start_at] = date_from_js_date_picker(params[:custom_command][:command_repeater_attributes], :start_at)
+    params.require(:custom_command).permit(:command, :response, :channel_id, :permission_id, command_repeater_attributes: [ :status_id, :cycle_seconds, :start_at ])
   end
 end
