@@ -4,7 +4,7 @@ class CustomCommandsController < ApplicationController
     CustomCommand.select('custom_commands.*,
                           COALESCE(command_permissions.permission_id, 0) AS command_permission_id,
                           COALESCE(command_repeaters.status_id, 0) AS repeater_status_id,
-                          command_repeaters.cycle_seconds AS repeater_cycle_time,
+                          command_repeaters.cycle_seconds AS repeater_cycle_seconds,
                           command_repeaters.start_at AS repeater_start_at')
                  .joins('LEFT JOIN command_permissions ON custom_commands.id = command_permissions.command_id')
                  .joins('LEFT JOIN command_repeaters ON custom_commands.id = command_repeaters.command_id')
