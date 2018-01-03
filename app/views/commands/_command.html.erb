@@ -1,16 +1,23 @@
-<% expandable_data = "command-#{command.id.to_i}-#{command.name}" %>
+<% expandable_data = "command-#{command.command_permission_id}-#{command.name}" %>
 <tr class="js-form-fields-container">
   <td>!<%= command.name %></td>
-  <td data-expandable="<%= expandable_data %>"><%= CommandPermission::PERMISSIONS[command.permission_id.to_i] %></td>
+  <td data-expandable="<%= expandable_data %>"><%= CommandPermission::PERMISSIONS[command.permission_id] %></td>
+  <td data-expandable="<%= expandable_data %>"><%= command.repeater_status_id > 0 ? CommandRepeater::STATUSES[command.repeater_status_id] : '-' %></td>
+  <td data-expandable="<%= expandable_data %>"><%= standard_table_text(command.repeater_cycle_seconds) %></td>
+  <td data-expandable="<%= expandable_data %>"><%= standard_table_date(command.repeater_start_at) %></td>
   <td data-expandable="<%= expandable_data %>">
     <span class="fake-link expander" data-expander="<%= expandable_data %>">Edit</span>
   </td>
 
   <td class="hidden" data-expandable="<%= expandable_data %>"><%= select_tag 'command[permission_id]', permission_options_for_select(command.permission_id) %></td>
+  <td class="hidden js-form-container" data-expandable="<%= expandable_data %>"><%= select_tag 'command[command_repeater_attributes][status_id]', repeater_status_options_for_select(command.repeater_status_id) %></td>
+  <td class="hidden js-form-container" data-expandable="<%= expandable_data %>"><%= number_field_tag 'command[command_repeater_attributes][cycle_seconds]', command.repeater_cycle_seconds %></td>
+  <td class="hidden js-form-container" data-expandable="<%= expandable_data %>"><%= text_field_tag 'command[command_repeater_attributes][start_at]', js_datepicker_date(command.repeater_start_at), class: 'jsDatepicker', id: nil %></td>
   <td class="hidden js-form-container" data-expandable="<%= expandable_data %>">
-
-    <%= form_tag command_path(id: command.id.to_i), method: :put do %>
-      <%= hidden_field_tag 'command[channel_id]', current_channel.id %>
+    <%= form_tag command_path(id: command.id), method: :put do %>
+      <%= hidden_field_tag 'command[command_permission_id]', command.command_permission_id %>
+      <%= hidden_field_tag 'command[command_repeater_id]', command.command_repeater_id %>
+      <%= hidden_field_tag 'command[channel_id]', command.channel_id || current_channel.id %>
       <%= hidden_field_tag 'command[name]', command.name %>
     <% end %>
     <span class="fake-link js-submit-form">Submit</span>

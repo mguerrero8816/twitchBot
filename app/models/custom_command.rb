@@ -8,7 +8,7 @@ class CustomCommand < ApplicationRecord
 
   def update_permission
     if !permission_id.nil?
-      current_permission = CommandPermission.where(command_id: id).first || CommandPermission.new(command_id: id, channel_id: channel_id)
+      current_permission = CommandPermission.where(command_id: id).first || CommandPermission.create(command_id: id, channel_id: channel_id)
       current_permission.permission_id = permission_id
       current_permission.save
     end
