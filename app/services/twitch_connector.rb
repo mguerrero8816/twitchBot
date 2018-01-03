@@ -41,11 +41,15 @@ module TwitchConnector
       Thread.current["bot_name"] = cached_bot_name
       Thread.current["bot_id"] = cached_bot_id
 
+      commands_data.each do |_, command_settings|
+        if command_settings.repeater_status_id == 1 && command_settings.repeater_cycle_seconds > 0 && (command_settings.repeater_start_at.nil? || command_settings.repeater_start_at <= Time.zone.now)
+          spawn_command_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
+        end
+      end
+
       custom_commands_data.each do |_, custom_command_settings|
-        p 'test1'
         if custom_command_settings.repeater_status_id == 1 && custom_command_settings.repeater_cycle_seconds > 0 && (custom_command_settings.repeater_start_at.nil? || custom_command_settings.repeater_start_at <= Time.zone.now)
-          p 'test2'
-          spawn_repeater(cached_channel_name, cached_bot_name, cached_bot_id, custom_command_settings)
+          spawn_custom_command_repeater(cached_channel_name, cached_bot_name, cached_bot_id, custom_command_settings)
         end
       end
 
@@ -105,12 +109,28 @@ module TwitchConnector
 
   def build_commands_data
     commands_list = TwitchBotCommands.methods(false)
+    command_settings = (
+      CommandPermission.select('command_permissions.command_name AS command_name,
+                                COALESCE(command_permissions.id, 0) AS command_permission_id,
+                                COALESCE(command_permissions.permission_id, 0) AS permission_id,
+                                COALESCE(command_repeaters.id, 0) AS command_repeater_id,
+                                COALESCE(command_repeaters.status_id, 0) AS repeater_status_id,
+                                COALESCE(command_repeaters.cycle_seconds, 0) AS repeater_cycle_seconds,
+                                command_repeaters.start_at AS repeater_start_at')
+                       .joins('LEFT JOIN command_repeaters ON command_permissions.command_name = command_repeaters.command_name AND command_permissions.channel_id = command_repeaters.channel_id')
+                       .where('command_permissions.channel_id = ? AND command_permissions.command_name IN (?) AND command_permissions.command_id IS NULL', channel_id, commands_list)
+    )
     permissions = CommandPermission.where('command_id IS NULL AND command_name IN (?) AND channel_id = ?', commands_list, channel_id)
-    Struct.new('CommandSettings', :command_name, :last_used, :permission_id)
+    Struct.new('CommandSettings', :command_name, :last_used, :permission_id, :repeater_status_id, :repeater_cycle_seconds, :repeater_start_at)
+    command_settings_data = {}
+    command_settings.each do |command_setting|
+      name_key = command_setting.command_name.to_sym
+      command_settings_data[name_key] = Struct::CommandSettings.new(name_key, Time.zone.now-COMMAND_TIME_LIMIT.seconds, command_setting.permission_id, command_setting.repeater_status_id, command_setting.repeater_cycle_seconds, command_setting.repeater_start_at)
+    end
     commands_data = {}
-    permissions.each do |permission|
-      name_key = permission.command_name.to_sym
-      commands_data[name_key] = Struct::CommandSettings.new(name_key, Time.zone.now-COMMAND_TIME_LIMIT.seconds, permission.permission_id)
+    commands_list.each do |command_name|
+      name_key = command_name.to_sym
+      commands_data[name_key] = command_settings_data[name_key] || Struct::CommandSettings.new(name_key, Time.zone.now-COMMAND_TIME_LIMIT.seconds, 0, 0, 0, nil)
     end
     commands_data
   end
@@ -130,7 +150,7 @@ module TwitchConnector
     Struct.new('CustomCommandSettings', :response, :last_used, :permission_id, :repeater_status_id, :repeater_cycle_seconds, :repeater_start_at)
     custom_commands_list.each do |custom_command|
       name_key = custom_command.command.to_sym
-      custom_commands_data[name_key] = Struct::CustomCommandSettings.new(custom_command.response, Time.zone.now-5.seconds, custom_command.command_permission_id, custom_command.repeater_status_id, custom_command.repeater_cycle_seconds, custom_command.repeater_start_at)
+      custom_commands_data[name_key] = Struct::CustomCommandSettings.new(custom_command.response, Time.zone.now-COMMAND_TIME_LIMIT.seconds, custom_command.command_permission_id, custom_command.repeater_status_id, custom_command.repeater_cycle_seconds, custom_command.repeater_start_at)
     end
     custom_commands_data
   end
@@ -161,7 +181,20 @@ module TwitchConnector
     (command_settings.permission_id == 1 || (command_settings.permission_id == 0 && is_admin)) && command_settings.last_used < (Time.zone.now - COMMAND_TIME_LIMIT.seconds)
   end
 
-  def spawn_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
+  def spawn_command_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
+    Thread.new do
+      Thread.current['type'] = 'command_repeater'
+      Thread.current["channel_name"] = cached_channel_name
+      Thread.current["bot_name"] = cached_bot_name
+      Thread.current["bot_id"] = cached_bot_id
+      sleep command_settings.repeater_cycle_seconds
+      bot_messages = [ TwitchBotCommands.try(command_settings.command_name) ].flatten
+      bot_messages.each{ |bot_message| send_channel_message(cached_channel_name, bot_message) }
+      spawn_command_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
+    end
+  end
+
+  def spawn_custom_command_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
     Thread.new do
       Thread.current['type'] = 'command_repeater'
       Thread.current["channel_name"] = cached_channel_name
@@ -169,7 +202,7 @@ module TwitchConnector
       Thread.current["bot_id"] = cached_bot_id
       sleep command_settings.repeater_cycle_seconds
       send_channel_message(cached_channel_name, command_settings.response)
-      spawn_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
+      spawn_custom_command_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
     end
   end
 
