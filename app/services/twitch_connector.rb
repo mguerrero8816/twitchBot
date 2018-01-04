@@ -11,6 +11,10 @@ module TwitchConnector
     send_command("PRIVMSG ##{target_channel_name} :#{message}")
   end
 
+  def queue_channel_message(message)
+    @messages << message
+  end
+
   def disconnect
     @running = false
     @socket  = nil
@@ -22,6 +26,7 @@ module TwitchConnector
       twitch_bot_threads.each{|thread| thread.kill}
     end
     kill_repeaters
+    kill_channel_messenger
   end
 
   def connect
@@ -35,6 +40,7 @@ module TwitchConnector
       cached_channel_name = channel_name
       cached_bot_name = bot_name
       cached_bot_id = id
+      initialize_channel_messenger(cached_channel_name, cached_bot_name, cached_bot_id)
       moderator_list = Moderator.where(channel_id: channel_id).map(&:name)
       moderator_list << cached_channel_name
       Thread.current["channel_name"] = cached_channel_name
@@ -164,14 +170,14 @@ module TwitchConnector
   def send_channel_command(cached_channel_name, is_admin, command_settings)
     if command_permitted(command_settings, is_admin)
       bot_messages = [TwitchBotCommands.try(command_settings.try(:command_name))].flatten
-      bot_messages.each{|bot_message| send_channel_message(cached_channel_name, bot_message) }
+      bot_messages.each{|bot_message| queue_channel_message(bot_message) }
       command_settings.last_used = Time.zone.now
     end
   end
 
   def send_channel_custom_command(cached_channel_name, is_admin, command_settings)
     if command_permitted(command_settings, is_admin)
-      send_channel_message(cached_channel_name, command_settings.response)
+      queue_channel_message(command_settings.response)
       command_settings.last_used = Time.zone.now
     end
   end
@@ -189,7 +195,7 @@ module TwitchConnector
       Thread.current["bot_id"] = cached_bot_id
       sleep command_settings.repeater_cycle_seconds
       bot_messages = [ TwitchBotCommands.try(command_settings.command_name) ].flatten
-      bot_messages.each{ |bot_message| send_channel_message(cached_channel_name, bot_message) }
+      bot_messages.each{ |bot_message| queue_channel_message(bot_message) }
       spawn_command_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
     end
   end
@@ -201,7 +207,7 @@ module TwitchConnector
       Thread.current["bot_name"] = cached_bot_name
       Thread.current["bot_id"] = cached_bot_id
       sleep command_settings.repeater_cycle_seconds
-      send_channel_message(cached_channel_name, command_settings.response)
+      queue_channel_message(command_settings.response)
       spawn_custom_command_repeater(cached_channel_name, cached_bot_name, cached_bot_id, command_settings)
     end
   end
@@ -209,5 +215,33 @@ module TwitchConnector
   def kill_repeaters
     repeater_threads = Thread.list.select{|thread| (thread[:bot_id] == id || ( thread[:channel_name] == channel_name && thread[:bot_name] == bot_name )) && thread[:type] == 'command_repeater' }
     repeater_threads.each{|thread| thread.kill}
+  end
+
+  def initialize_channel_messenger(cached_channel_name, cached_bot_name, cached_bot_id)
+    @messages = []
+    spawn_channel_messenger(cached_channel_name, cached_bot_name, cached_bot_id)
+  end
+
+  # this repeater sends messages to the channel every other second
+  def spawn_channel_messenger(cached_channel_name, cached_bot_name, cached_bot_id)
+    Thread.new do
+      Thread.current['type'] = 'channel_messenger'
+      Thread.current["channel_name"] = cached_channel_name
+      Thread.current["bot_name"] = cached_bot_name
+      Thread.current["bot_id"] = cached_bot_id
+      sleep 2
+      if @messages.length > 0
+        message = @messages[0]
+        send_channel_message(cached_channel_name, message)
+        @messages = @messages.drop(1)
+      end
+      spawn_channel_messenger(cached_channel_name)
+    end
+  end
+
+  def kill_channel_messenger
+    @messages = []
+    messenger_thread = Thread.list.select{|thread| (thread[:bot_id] == id || ( thread[:channel_name] == channel_name && thread[:bot_name] == bot_name )) && thread[:type] == 'channel_messenger' }
+    messenger_thread.each{|thread| thread.kill}
   end
 end
