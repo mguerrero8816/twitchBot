@@ -235,7 +235,7 @@ module TwitchConnector
         send_channel_message(cached_channel_name, message)
         @messages = @messages.drop(1)
       end
-      spawn_channel_messenger(cached_channel_name)
+      spawn_channel_messenger(cached_channel_name, cached_bot_name, cached_bot_id)
     end
   end
 
