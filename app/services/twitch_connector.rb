@@ -71,13 +71,14 @@ module TwitchConnector
           command_key = message
           command_key[0] = ''
           command_key = command_key.to_sym
-          @logger.info "USER COMMAND: #{user} - #{message}"
 
           if line.include?('PING :tmi.twitch.tv')
             send_pong_response
           elsif commands_list.include?(command_key)
+            @logger.info "USER COMMAND: #{user} - #{message}"
             send_channel_command(cached_channel_name, moderator_list.include?(user), commands_data[command_key])
           elsif custom_commands_list.include?(command_key)
+            @logger.info "USER COMMAND: #{user} - #{message}"
             send_channel_custom_command(cached_channel_name, moderator_list.include?(user), custom_commands_data[command_key])
           end
           @logger.info "> #{line}"
