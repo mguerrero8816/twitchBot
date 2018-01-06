@@ -20,7 +20,7 @@ class CommandsController < ApplicationController
     @commands = []
     command_names.each_with_index do |command_name, index|
       sql_data = commands_data[command_name]
-      bot_command = Struct::CommandSettings.new(index, sql_data.try(:command_permission_id), command_name, sql_data.try(:permission_id), sql_data.try(:channel_id), sql_data.try(:command_repeater_id), sql_data.try(:repeater_status_id), sql_data.try(:repeater_cycle_seconds), sql_data.try(:repeater_start_at))
+      bot_command = Struct::CommandSettings.new(index, sql_data.try(:command_permission_id).to_i, command_name, sql_data.try(:permission_id).to_i, sql_data.try(:channel_id).to_i, sql_data.try(:command_repeater_id).to_i, sql_data.try(:repeater_status_id).to_i, sql_data.try(:repeater_cycle_seconds), sql_data.try(:repeater_start_at))
       @commands << bot_command
     end
   end
