@@ -7,12 +7,11 @@ module TwitchConnector
   TWITCH_PORT = 6667.freeze
   COMMAND_TIME_LIMIT = 5.freeze # time in seconds to command cooldown
 
-  def send_channel_message(target_channel_name, message)
-    send_command("PRIVMSG ##{target_channel_name} :#{message}")
-  end
-
-  def queue_channel_message(message)
-    @messages << message
+  def direct_channel_message(message)
+    socket = TCPSocket.new(TWITCH_SERVER, TWITCH_PORT)
+    socket.puts("PASS #{TWITCH_PASS}")
+    socket.puts("NICK #{TWITCH_USER}")
+    socket.puts("PRIVMSG ##{channel_name} :#{message}")
   end
 
   def disconnect
@@ -105,13 +104,21 @@ module TwitchConnector
     join_channel
   end
 
-  def send_command(message)
-    @logger.info "< #{message}"
-    @socket.puts(message)
+  def queue_channel_message(message)
+    @messages << message
+  end
+
+  def send_channel_message(target_channel_name, message)
+    send_command("PRIVMSG ##{target_channel_name} :#{message}")
   end
 
   def join_channel
     send_command("JOIN ##{channel_name}")
+  end
+
+  def send_command(message)
+    @logger.info "< #{message}"
+    @socket.puts(message)
   end
 
   def build_commands_data
