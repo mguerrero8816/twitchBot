@@ -1,4 +1,8 @@
 $(document).ready(function(){
+  bindSortables()
+})
+
+function bindSortables(){
   $(".sorter > th").click(function(){
     var dataSortable = $(this).closest('.sorter').data('sortable')
     var sortable = $('.sortable[data-sorter="' + dataSortable + '"]')
@@ -10,9 +14,8 @@ $(document).ready(function(){
     } else {
       sortAscending(sortableRows, clickedColIndex).appendTo(sortable)
     }
-
   })
-})
+}
 
 function tagSortOrder(clickedCol){
   var storedSortOrder = clickedCol.data('sort-order')
