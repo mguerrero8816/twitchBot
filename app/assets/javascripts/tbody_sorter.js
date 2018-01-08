@@ -19,9 +19,12 @@ function tagSortOrder(clickedCol){
   clickedCol.closest('tr').find('th').data('sort-order', null)
   var sortByDescending = true
   if(storedSortOrder === 'ascending'){
-  } else {
+    clickedCol.data('sort-order', 'descending')
+  } else if(storedSortOrder === 'descending') {
     sortByDescending = false
     clickedCol.data('sort-order', 'ascending')
+  } else {
+    clickedCol.data('sort-order', 'descending')
   }
   return sortByDescending
 }
