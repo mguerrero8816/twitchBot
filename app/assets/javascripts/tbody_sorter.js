@@ -17,14 +17,18 @@ $(document).ready(function(){
 function tagSortOrder(clickedCol){
   var storedSortOrder = clickedCol.data('sort-order')
   clickedCol.closest('tr').find('th').data('sort-order', null)
+  clickedCol.closest('tr').find('.sort-indicator').remove()
   var sortByDescending = true
   if(storedSortOrder === 'ascending'){
     clickedCol.data('sort-order', 'descending')
+    clickedCol.append('<i class="fa fa-sort-desc sort-indicator" aria-hidden="true"></i>')
   } else if(storedSortOrder === 'descending') {
     sortByDescending = false
     clickedCol.data('sort-order', 'ascending')
+    clickedCol.append('<i class="fa fa-sort-asc sort-indicator" aria-hidden="true"></i>')
   } else {
     clickedCol.data('sort-order', 'descending')
+    clickedCol.append('<i class="fa fa-sort-desc sort-indicator" aria-hidden="true"></i>')
   }
   return sortByDescending
 }
