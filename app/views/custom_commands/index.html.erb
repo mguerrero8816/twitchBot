@@ -1,6 +1,6 @@
 <table class="table">
   <thead>
-    <tr>
+    <tr class="sorter" data-sortable="custom-commands">
       <th>Command</th>
       <th>Response</th>
       <th>Permission</th>
@@ -35,7 +35,7 @@
       </td>
     </tr>
   </tbody>
-  <tbody>
+  <tbody class="sortable" data-sorter="custom-commands">
     <%= render partial: 'custom_command', collection: @custom_commands %>
   </tbody>
 </table>
