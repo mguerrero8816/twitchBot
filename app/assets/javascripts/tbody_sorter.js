@@ -37,7 +37,11 @@ function sortDescending(sortableRows, clickedColIndex){
   return sortableRows.sort(function(a,b){
     tda = $(a).find("td:eq(" + clickedColIndex + ")").text()
     tdb = $(b).find("td:eq(" + clickedColIndex + ")").text()
-    if(tda > tdb){
+    if(tda === '-'){
+      return 1
+    } else if(tdb === '-'){
+      return -1
+    } else if(tda > tdb){
       return 1
     } else if(tda < tdb) {
       return -1
