@@ -1,6 +1,6 @@
 <table class="table">
-  <thead class="hidden" data-expandable="new-moderator">
-    <tr>
+  <thead>
+    <tr class="sorter" data-sortable="moderators">
       <th>Name</th>
       <th></th>
     </tr>
@@ -25,13 +25,7 @@
       </td>
     </tr>
   </tbody>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
+  <tbody class="sortable" data-sorter="moderators">
     <% @moderators.each do |moderator| %>
       <tr data-expandable="moderator-<%= moderator.id %>">
         <td><%= moderator.name %></td>
