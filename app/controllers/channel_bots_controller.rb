@@ -61,7 +61,7 @@ class ChannelBotsController < ApplicationController
   end
 
   def direct_channel_message
-    ChannelBot.find(params[:id]).direct_channel_message(params[:message])
+    ChannelBot.find(params[:id]).direct_channel_message(params[:message]) if params[:message]
     render json: true
   end
 
