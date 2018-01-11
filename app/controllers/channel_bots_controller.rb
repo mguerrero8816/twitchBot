@@ -60,6 +60,11 @@ class ChannelBotsController < ApplicationController
     redirect_to channel_bot_path(params[:id])
   end
 
+  def direct_channel_message
+    ChannelBot.find(params[:id]).direct_channel_message(params[:message])
+    render json: true
+  end
+
   private
 
   def channel_bot_params

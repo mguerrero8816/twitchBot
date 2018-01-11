@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     post   :add_command_permission,     on: :member
     delete :destroy_moderator,          on: :member
     delete :destroy_command_permission, on: :member
+    post   :direct_channel_message,     on: :member
   end
   resources :custom_commands, except: [:new, :edit]
   resources :commands

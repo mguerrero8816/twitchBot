@@ -29,6 +29,14 @@
           <% end %>
         </td>
       </tr>
+      <tr colspan="5">
+        <td>
+          <%= form_tag direct_channel_message_channel_bot_path(channel_bot.id), class: 'post-with-ajax' do %>
+            <%= text_field_tag 'message' %>
+            <%= submit_tag 'Send Direct Message' %>
+          <% end %>
+        </td>
+      </tr>
     <% end %>
   </tbody>
 </table>
